@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Project specific
+node_modules
+/backend/node_modules
+/backend/dist
+.env
+backend/.env
+.agent/
+

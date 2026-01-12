@@ -19,9 +19,22 @@ A modern, test-optimized e-commerce SPA for sport fishing enthusiasts.
 
 ## Getting Started
 
+### Local Development (Frontend only)
 1.  Current directory: `/Users/nicodemus/Egen test sida`
 2.  Install dependencies: `npm install`
 3.  Run dev server: `npm run dev`
+
+### Full Stack (Docker)
+1.  Make sure Docker Desktop is running.
+2.  Run `docker compose up --build`
+3.  In a new terminal, run migrations & seed:
+    ```bash
+    # Run migrations
+    docker compose exec api npx prisma migrate dev --name init
+    # Seed data
+    docker compose exec api npm run seed
+    ```
+4.  The API will be available at `http://localhost:4000` and proxied from the frontend.
 
 ## Testing Guide
 

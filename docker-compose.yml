@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: greatcatch-db
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: greatcatch
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  api:
+    build:
+      context: ./backend
+    container_name: greatcatch-api
+    environment:
+      DATABASE_URL: "postgresql://pguser:secretpassword@db:5432/greatcatch?schema=public"
+      JWT_SECRET: "super-secret-key-change-me"
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+
+volumes:
+  pgdata:

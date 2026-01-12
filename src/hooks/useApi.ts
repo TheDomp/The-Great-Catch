@@ -1,5 +1,5 @@
 import { useChaos } from '../context/ChaosContext';
-import { PRODUCTS } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
 import type { Product } from '../data/mockData';
 
 export interface CheckoutData {
@@ -11,77 +11,83 @@ export interface CheckoutData {
 
 export function useApi() {
     const { latencyMode, serverErrorMode, stockMismatchMode } = useChaos();
+    const { user } = useAuth();
 
     const simulateDelay = async () => {
-        const delay = latencyMode ? 2000 : 300;
-        return new Promise(resolve => setTimeout(resolve, delay));
+        const delay = latencyMode ? 2000 : 0;
+        if (delay > 0) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
     };
 
-    const checkChaos = () => {
+    const handleResponse = async (response: Response) => {
         if (serverErrorMode) {
             throw new Error('500 Internal Server Error (Chaos Mode)');
         }
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'An unexpected error occurred' }));
+            throw new Error(error.error || 'Request failed');
+        }
+        return response.json();
     };
 
     const getProducts = async (category?: string, sort?: string): Promise<Product[]> => {
         await simulateDelay();
-        checkChaos();
 
-        let filtered = [...PRODUCTS];
-        if (category) {
-            filtered = filtered.filter(p => p.category === category);
-        }
+        const url = new URL('/api/products', window.location.origin);
+        if (category) url.searchParams.append('category', category);
+
+        const response = await fetch(url.toString());
+        let products = await handleResponse(response);
 
         if (sort === 'price-asc') {
-            filtered.sort((a, b) => a.price - b.price);
+            products.sort((a: Product, b: Product) => a.price - b.price);
         } else if (sort === 'price-desc') {
-            filtered.sort((a, b) => b.price - a.price);
+            products.sort((a: Product, b: Product) => b.price - a.price);
         }
 
-        return filtered;
+        return products;
     };
 
-    const getProduct = async (id: string): Promise<Product | undefined> => {
+    const getProduct = async (id: string): Promise<Product> => {
         await simulateDelay();
-        checkChaos();
-        return PRODUCTS.find(p => p.id === id);
+        const response = await fetch(`/api/products/${id}`);
+        return handleResponse(response);
     };
 
     const checkout = async (data: CheckoutData): Promise<{ success: true; orderId: string; total: number }> => {
         await simulateDelay();
-        checkChaos();
 
-        // Stock Mismatch Logic
         if (stockMismatchMode) {
-            // Simulate that one item is actually out of stock
             throw new Error('Out of Stock: One or more items are unavailable (Chaos Mode)');
         }
 
-        // Basic Validation (Discount Code)
-        // Note: Credit card validation is mostly frontend, but backend checks validity too.
-        // Here we just accept format.
-
-        let discount = 0;
-        if (data.discountCode === 'FISKE20') {
-            discount = 0.2;
+        if (!user) {
+            throw new Error('You must be logged in to checkout');
         }
 
-        // Calculate total (mock calculation based on passed items)
-        // In a real app, we'd fetch prices from DB. Here we lookup.
-        let subtotal = 0;
-        for (const item of data.items) {
-            const product = PRODUCTS.find(p => p.id === item.id);
-            if (product) {
-                subtotal += product.price * item.quantity;
-            }
-        }
+        const backendData = {
+            userId: user.id,
+            items: data.items.map(item => ({
+                productId: item.id,
+                quantity: item.quantity
+            })),
+            discountCode: data.discountCode
+        };
 
-        const total = subtotal * (1 - discount);
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(backendData)
+        });
+
+        const order = await handleResponse(response);
 
         return {
             success: true,
-            orderId: `ORD-${Math.floor(Math.random() * 10000)}`,
-            total: Math.round(total)
+            orderId: order.id,
+            total: order.total
         };
     };
 

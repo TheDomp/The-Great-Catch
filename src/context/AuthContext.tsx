@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 type Role = 'GUEST' | 'USER' | 'ADMIN';
 
 interface User {
+    id: string;
     email: string;
     name: string;
     role: Role;
@@ -37,24 +38,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const login = async (email: string, password: string): Promise<boolean> => {
-        if (password !== 'Password123!') {
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+                return false;
+            }
+
+            const data = await response.json();
+            setUser(data.user);
+            localStorage.setItem('tgc_user', JSON.stringify(data.user));
+            return true;
+        } catch (error) {
+            console.error('Login error:', error);
             return false;
         }
-
-        let userData: User | null = null;
-        if (email === 'admin@test.se') {
-            userData = { email, name: 'Admin User', role: 'ADMIN' };
-        } else if (email === 'customer@test.se') {
-            userData = { email, name: 'Test Customer', role: 'USER' };
-        }
-
-        if (userData) {
-            setUser(userData);
-            localStorage.setItem('tgc_user', JSON.stringify(userData));
-            return true;
-        }
-
-        return false;
     };
 
     const logout = () => {
