@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBn54iQ5BAWrNVqgnDBJikrZgvveONh2Nw",
+    apiKey: "AIzaSyBn54iQ5BAWrNVqgnDBJIkrZgvvEOnh2Nw",
     authDomain: "the-great-catch.firebaseapp.com",
     projectId: "the-great-catch",
     storageBucket: "the-great-catch.firebasestorage.app",
