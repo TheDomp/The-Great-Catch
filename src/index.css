@@ -7,5 +7,14 @@
 }
 
 body {
-  @apply bg-background text-slate-100;
+  @apply bg-ocean-gradient text-slate-100 min-h-screen selection:bg-primary selection:text-white;
+  scroll-behavior: smooth;
+}
+
+.glass-card {
+  @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-premium;
+}
+
+.premium-transition {
+  @apply transition-all duration-300 ease-in-out;
 }

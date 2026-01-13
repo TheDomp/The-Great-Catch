@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from 'react';
 import { useChaos } from '../context/ChaosContext';
 import { useAuth } from '../context/AuthContext';
 import type { Product } from '../data/mockData';
@@ -13,14 +14,14 @@ export function useApi() {
     const { latencyMode, serverErrorMode, stockMismatchMode } = useChaos();
     const { user } = useAuth();
 
-    const simulateDelay = async () => {
+    const simulateDelay = useCallback(async () => {
         const delay = latencyMode ? 2000 : 0;
         if (delay > 0) {
             await new Promise(resolve => setTimeout(resolve, delay));
         }
-    };
+    }, [latencyMode]);
 
-    const handleResponse = async (response: Response) => {
+    const handleResponse = useCallback(async (response: Response) => {
         if (serverErrorMode) {
             throw new Error('500 Internal Server Error (Chaos Mode)');
         }
@@ -30,9 +31,9 @@ export function useApi() {
             throw new Error(error.error || 'Request failed');
         }
         return response.json();
-    };
+    }, [serverErrorMode]);
 
-    const getProducts = async (category?: string, sort?: string): Promise<Product[]> => {
+    const getProducts = useCallback(async (category?: string, sort?: string): Promise<Product[]> => {
         await simulateDelay();
 
         const url = new URL('/api/products', window.location.origin);
@@ -48,15 +49,15 @@ export function useApi() {
         }
 
         return products;
-    };
+    }, [simulateDelay, handleResponse]);
 
-    const getProduct = async (id: string): Promise<Product> => {
+    const getProduct = useCallback(async (id: string): Promise<Product> => {
         await simulateDelay();
         const response = await fetch(`/api/products/${id}`);
         return handleResponse(response);
-    };
+    }, [simulateDelay, handleResponse]);
 
-    const checkout = async (data: CheckoutData): Promise<{ success: true; orderId: string; total: number }> => {
+    const checkout = useCallback(async (data: CheckoutData): Promise<{ success: true; orderId: string; total: number }> => {
         await simulateDelay();
 
         if (stockMismatchMode) {
@@ -89,11 +90,33 @@ export function useApi() {
             orderId: order.id,
             total: order.total
         };
-    };
+    }, [simulateDelay, handleResponse, stockMismatchMode, user]);
 
-    return {
+    const updateProduct = useCallback(async (id: string, data: Partial<Product>): Promise<Product> => {
+        await simulateDelay();
+        const response = await fetch(`/api/products/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        return handleResponse(response);
+    }, [simulateDelay, handleResponse]);
+
+    const updateUser = useCallback(async (id: string, data: { name?: string; role?: string }): Promise<any> => {
+        await simulateDelay();
+        const response = await fetch(`/api/users/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        return handleResponse(response);
+    }, [simulateDelay, handleResponse]);
+
+    return useMemo(() => ({
         getProducts,
         getProduct,
-        checkout
-    };
+        checkout,
+        updateProduct,
+        updateUser
+    }), [getProducts, getProduct, checkout, updateProduct, updateUser]);
 }

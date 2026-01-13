@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
 type Role = 'GUEST' | 'USER' | 'ADMIN';
@@ -13,6 +13,8 @@ interface User {
 interface AuthContextType {
     user: User | null;
     login: (email: string, password: string) => Promise<boolean>;
+    register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+    deleteAccount: () => Promise<boolean>;
     logout: () => void;
     isAuthenticated: boolean;
     isAdmin: boolean;
@@ -37,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
     }, []);
 
-    const login = async (email: string, password: string): Promise<boolean> => {
+    const login = useCallback(async (email: string, password: string): Promise<boolean> => {
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -57,22 +59,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Login error:', error);
             return false;
         }
-    };
+    }, []);
 
-    const logout = () => {
+    const register = useCallback(async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, name })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return { success: false, error: data.error || 'Registration failed' };
+            }
+
+            setUser(data.user);
+            localStorage.setItem('tgc_user', JSON.stringify(data.user));
+            return { success: true };
+        } catch (error) {
+            console.error('Register error:', error);
+            return { success: false, error: 'Network error or server down' };
+        }
+    }, []);
+
+    const deleteAccount = useCallback(async (): Promise<boolean> => {
+        if (!user) return false;
+        try {
+            const response = await fetch(`/api/users/${user.id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                logout();
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Delete account error:', error);
+            return false;
+        }
+    }, [user]);
+
+    const logout = useCallback(() => {
         setUser(null);
         localStorage.removeItem('tgc_user');
-    };
+    }, []);
+
+    const value = useMemo(() => ({
+        user,
+        login,
+        register,
+        deleteAccount,
+        logout,
+        isAuthenticated: !!user,
+        isAdmin: user?.role === 'ADMIN',
+        loading
+    }), [user, loading, login, register, deleteAccount, logout]);
 
     return (
-        <AuthContext.Provider value={{
-            user,
-            login,
-            logout,
-            isAuthenticated: !!user,
-            isAdmin: user?.role === 'ADMIN',
-            loading
-        }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
+import { Lock, Mail, AlertCircle, Loader2, Anchor } from 'lucide-react';
 
 export function LoginPage() {
     const { login, isAuthenticated, isAdmin, loading: authLoading } = useAuth();
@@ -12,7 +12,6 @@ export function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // If already logged in, redirect away from login page
     useEffect(() => {
         if (!authLoading && isAuthenticated) {
             if (isAdmin) {
@@ -33,12 +32,11 @@ export function LoginPage() {
         try {
             const success = await login(email, password);
             if (!success) {
-                setError('Invalid email or password. Please try again.');
+                setError('Access denied. Check your credentials.');
                 setIsSubmitting(false);
             }
-            // useEffect will handle navigation on success
         } catch (err) {
-            setError('An unexpected error occurred. Please try again.');
+            setError('The deep sea is turbulent. Try again later.');
             setIsSubmitting(false);
         }
     };
@@ -46,57 +44,58 @@ export function LoginPage() {
     if (authLoading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="w-10 h-10 animate-spin text-secondary mb-4" />
-                <p className="text-muted">Loading authentication...</p>
+                <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+                <p className="text-muted">Analyzing credentials...</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-md mx-auto py-12 animate-fade-in">
-            <div className="bg-surface rounded-xl border border-white/5 p-8 shadow-2xl relative overflow-hidden">
-                {/* Visual Accent */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary to-primary" />
+        <div className="max-w-md mx-auto py-12 animate-fade-in px-4">
+            <div className="glass-card rounded-3xl p-8 md:p-10 shadow-cyan-glow/10 relative overflow-hidden">
+                <div className="flex justify-center mb-6">
+                    <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center">
+                        <Anchor className="w-8 h-8 text-primary" />
+                    </div>
+                </div>
 
-                <h1 className="text-3xl font-bold mb-2 text-center text-white">The Great Catch</h1>
-                <p className="text-muted text-center mb-8 text-sm">Sign in to manage your gear</p>
+                <h1 className="text-3xl font-black mb-2 text-center text-white tracking-tighter">SURFACE AGAIN</h1>
+                <p className="text-muted text-center mb-10 text-sm">Log in to access your dashboard</p>
 
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-6 flex items-center gap-3 text-sm animate-shake" data-testid="login-error">
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl mb-6 flex items-center gap-3 text-sm" data-testid="login-error">
                         <AlertCircle className="w-5 h-5 flex-shrink-0" />
                         <span>{error}</span>
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted">Email Address</label>
-                        <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="block text-xs font-bold uppercase tracking-widest ml-1 text-slate-400">Email Address</label>
+                        <div className="relative group">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="email"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
-                                className="w-full bg-background border border-white/10 rounded-lg pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-secondary/50 focus:border-transparent outline-none transition-all"
-                                placeholder="admin@test.se"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-slate-600"
+                                placeholder="captain@vessel.com"
                                 required
-                                data-testid="input-email"
                             />
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted">Password</label>
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                    <div className="space-y-2">
+                        <label className="block text-xs font-bold uppercase tracking-widest ml-1 text-slate-400">Secure Password</label>
+                        <div className="relative group">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="password"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
-                                className="w-full bg-background border border-white/10 rounded-lg pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-secondary/50 focus:border-transparent outline-none transition-all"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-slate-600"
                                 placeholder="••••••••"
                                 required
-                                data-testid="input-password"
                             />
                         </div>
                     </div>
@@ -104,33 +103,33 @@ export function LoginPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-secondary hover:bg-secondary/90 disabled:opacity-50 text-white py-3 rounded-lg font-bold transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-secondary/20"
-                        data-testid="login-submit-btn"
+                        className="w-full bg-primary hover:bg-primary-dark disabled:opacity-50 text-white py-4 rounded-xl font-black uppercase tracking-widest transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
                     >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                Authenticating...
-                            </>
-                        ) : (
-                            'Sign In'
-                        )}
+                        {isSubmitting ? 'VERIFYING...' : 'SIGN IN'}
                     </button>
                 </form>
 
-                <div className="mt-8 pt-6 border-t border-white/5 space-y-3">
-                    <p className="text-center text-xs text-muted font-bold tracking-widest uppercase">Demo Access</p>
+                <div className="mt-8 text-center">
+                    <p className="text-slate-400 text-sm">
+                        New to the fleet?{' '}
+                        <Link to="/register" className="text-primary font-bold hover:underline">
+                            Request Access
+                        </Link>
+                    </p>
+                </div>
+
+                <div className="mt-10 pt-8 border-t border-white/10 space-y-4">
+                    <p className="text-center text-[10px] text-slate-500 font-black tracking-[0.2em] uppercase">Quick Access (Beta)</p>
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 cursor-pointer hover:border-white/20 transition-colors" onClick={() => { setEmail('admin@test.se'); setPassword('Password123!'); }}>
-                            <p className="text-[10px] text-muted">Admin</p>
-                            <p className="text-[11px] font-mono text-secondary">admin@test.se</p>
-                        </div>
-                        <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 cursor-pointer hover:border-white/20 transition-colors" onClick={() => { setEmail('customer@test.se'); setPassword('Password123!'); }}>
-                            <p className="text-[10px] text-muted">Customer</p>
-                            <p className="text-[11px] font-mono text-secondary">customer@test.se</p>
-                        </div>
+                        <button className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left" onClick={() => { setEmail('admin@test.se'); setPassword('Password123!'); }}>
+                            <p className="text-[10px] text-slate-500 font-bold uppercase">Admin</p>
+                            <p className="text-xs text-primary font-mono truncate">admin@test.se</p>
+                        </button>
+                        <button className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left" onClick={() => { setEmail('customer@test.se'); setPassword('Password123!'); }}>
+                            <p className="text-[10px] text-slate-500 font-bold uppercase">Test User</p>
+                            <p className="text-xs text-primary font-mono truncate">customer@test.se</p>
+                        </button>
                     </div>
-                    <p className="text-center text-[10px] text-slate-500 italic">Password for all: Password123!</p>
                 </div>
             </div>
         </div>

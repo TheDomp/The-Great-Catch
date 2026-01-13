@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useApi } from '../hooks/useApi';
 import type { CheckoutData } from '../hooks/useApi';
-import { CheckCircle, CreditCard, User, MapPin, AlertCircle } from 'lucide-react';
+import { CheckCircle, CreditCard, MapPin, AlertCircle, Anchor, Ship, ArrowRight, ChevronLeft } from 'lucide-react';
 
 type Step = 'address' | 'payment' | 'confirmation';
 
 export function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart();
     const { checkout } = useApi();
-    const navigate = useNavigate();
 
     const [step, setStep] = useState<Step>('address');
     const [loading, setLoading] = useState(false);
@@ -27,9 +26,15 @@ export function CheckoutPage() {
 
     if (items.length === 0 && !orderDetails) {
         return (
-            <div className="text-center py-20">
-                <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
-                <Link to="/" className="text-secondary hover:underline">Go back to shop</Link>
+            <div className="text-center py-32 animate-fade-in flex flex-col items-center">
+                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-8">
+                    <Ship className="w-12 h-12 text-primary/40" />
+                </div>
+                <h2 className="text-4xl font-black mb-4 tracking-tighter text-white uppercase">Checkout Void</h2>
+                <p className="text-slate-500 font-bold tracking-widest uppercase text-xs mb-10">You cannot proceed without gear.</p>
+                <Link to="/" className="inline-block bg-primary hover:bg-primary-dark text-white px-10 py-4 rounded-xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-primary/20">
+                    Return to Dock
+                </Link>
             </div>
         );
     }
@@ -67,7 +72,7 @@ export function CheckoutPage() {
             clearCart();
             setStep('confirmation');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Checkout Failed');
+            setError(err instanceof Error ? err.message : 'Fleet Transmission Error');
         } finally {
             setLoading(false);
         }
@@ -75,176 +80,201 @@ export function CheckoutPage() {
 
     if (step === 'confirmation' && orderDetails) {
         return (
-            <div className="max-w-md mx-auto py-12 text-center animate-scale-in">
-                <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="w-10 h-10" />
+            <div className="max-w-xl mx-auto py-20 text-center animate-scale-in flex flex-col items-center">
+                <div className="w-24 h-24 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mb-8 border border-green-500/20 shadow-lg shadow-green-500/10">
+                    <CheckCircle className="w-12 h-12" />
                 </div>
-                <h1 className="text-3xl font-bold text-white mb-2" data-testid="order-success-msg">Order Confirmed!</h1>
-                <p className="text-muted mb-6">Thank you for your purchase.</p>
+                <h1 className="text-5xl font-black text-white mb-2 tracking-tighter uppercase" data-testid="order-success-msg">MISSION SUCCESS</h1>
+                <p className="text-slate-500 font-bold tracking-widest uppercase text-xs mb-12">Your gear has been commissioned and dispatched.</p>
 
-                <div className="bg-surface rounded-lg p-6 mb-8 text-left border border-white/5">
-                    <p className="text-sm text-muted">Order ID</p>
-                    <p className="font-mono text-lg font-bold mb-4" data-testid="order-id">{orderDetails.id}</p>
-                    <p className="text-sm text-muted">Total Paid</p>
-                    <p className="font-bold text-2xl text-primary-foreground">${orderDetails.total}</p>
+                <div className="glass-card rounded-3xl p-10 mb-10 text-left border border-white/10 w-full shadow-cyan-glow/5 relative overflow-hidden text-white/5 mx-1" style={{ width: 'calc(100%)' }}>
+                    <div className="relative z-10 text-white">
+                        <div className="mb-8 pb-8 border-b border-white/10">
+                            <p className="text-[10px] text-primary-dark font-black uppercase tracking-[0.2em] mb-2">Manifest Serial</p>
+                            <p className="font-mono text-xl font-black text-white tracking-widest" data-testid="order-id">{orderDetails.id}</p>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <p className="text-[10px] text-primary-dark font-black uppercase tracking-[0.2em] mb-1">Final Settlement</p>
+                                <p className="font-black text-5xl text-white tracking-tighter">${orderDetails.total}</p>
+                            </div>
+                            <Anchor className="w-16 h-16 text-primary/10" />
+                        </div>
+                    </div>
                 </div>
 
-                <Link to="/" className="inline-block bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-lg font-bold">
-                    Continue Shopping
+                <Link to="/" className="bg-white/5 hover:bg-white/10 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-[0.2em] border border-white/10 transition-all active:scale-95">
+                    Return to High Seas
                 </Link>
             </div>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-center mb-12">
-                <StepIndicator current={step} step="address" icon={MapPin} label="Address" />
-                <div className={`w-12 h-1 mx-4 transition-colors ${step === 'address' ? 'bg-slate-700' : 'bg-secondary'}`} />
-                <StepIndicator current={step} step="payment" icon={CreditCard} label="Payment" />
-                <div className={`w-12 h-1 mx-4 transition-colors ${step === 'confirmation' ? 'bg-secondary' : 'bg-slate-700'}`} />
-                <StepIndicator current={step} step="confirmation" icon={CheckCircle} label="Done" />
+        <div className="max-w-6xl mx-auto pb-24">
+            <div className="flex items-center justify-center mb-16 gap-4">
+                <StepIndicator current={step} step="address" icon={MapPin} label="Logistics" />
+                <div className={`w-16 h-0.5 transition-all duration-700 ${step === 'address' ? 'bg-white/10' : 'bg-primary shadow-sm shadow-primary/50'}`} />
+                <StepIndicator current={step} step="payment" icon={CreditCard} label="Settlement" />
+                <div className={`w-16 h-0.5 transition-all duration-700 ${step === 'confirmation' ? 'bg-primary shadow-sm shadow-primary/50' : 'bg-white/10'}`} />
+                <StepIndicator current={step} step="confirmation" icon={CheckCircle} label="Complete" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="md:col-span-2">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <div className="lg:col-span-8 space-y-8">
                     {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-6 flex items-center gap-2 animate-shake" data-testid="checkout-error">
-                            <AlertCircle className="w-5 h-5" />
-                            {error}
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-6 rounded-2xl mb-8 flex items-center gap-4 animate-shake" data-testid="checkout-error">
+                            <AlertCircle className="w-6 h-6 flex-shrink-0" />
+                            <p className="font-black text-xs uppercase tracking-widest">{error}</p>
                         </div>
                     )}
 
-                    <div className="bg-surface rounded-xl border border-white/5 p-6 md:p-8">
+                    <div className="glass-card rounded-3xl border border-white/10 p-8 md:p-12 shadow-cyan-glow/5">
                         {step === 'address' && (
-                            <div className="space-y-4 animate-fade-in">
-                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                    <User className="w-5 h-5 text-secondary" /> Shipping Address
-                                </h2>
+                            <div className="space-y-8 animate-fade-in">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 text-muted">Street Address</label>
-                                    <input
-                                        type="text"
-                                        value={formData.address.street}
-                                        onChange={e => handleInputChange('address', 'street', e.target.value)}
-                                        className="w-full bg-background border border-white/10 rounded-lg p-3 focus:ring-2 focus:ring-secondary/50 outline-none"
-                                        data-testid="input-street"
-                                    />
+                                    <h2 className="text-3xl font-black text-white mb-2 tracking-tighter uppercase">Logistics Hub</h2>
+                                    <p className="text-slate-500 font-bold tracking-widest uppercase text-[10px]">Supply chain destination details</p>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1 text-muted">City</label>
+
+                                <div className="space-y-6 pt-4">
+                                    <div className="group">
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-primary-dark group-focus-within:text-primary transition-colors">Sector Address</label>
                                         <input
                                             type="text"
-                                            value={formData.address.city}
-                                            onChange={e => handleInputChange('address', 'city', e.target.value)}
-                                            className="w-full bg-background border border-white/10 rounded-lg p-3 focus:ring-2 focus:ring-secondary/50 outline-none"
-                                            data-testid="input-city"
+                                            placeholder="Enter fleet-side docking address"
+                                            value={formData.address.street}
+                                            onChange={e => handleInputChange('address', 'street', e.target.value)}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-700 font-medium"
+                                            data-testid="input-street"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1 text-muted">Zip Code</label>
-                                        <input
-                                            type="text"
-                                            value={formData.address.zip}
-                                            onChange={e => handleInputChange('address', 'zip', e.target.value)}
-                                            className="w-full bg-background border border-white/10 rounded-lg p-3 focus:ring-2 focus:ring-secondary/50 outline-none"
-                                            data-testid="input-zip"
-                                        />
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div className="group">
+                                            <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-primary-dark group-focus-within:text-primary transition-colors">Port / City</label>
+                                            <input
+                                                type="text"
+                                                placeholder="City Gate"
+                                                value={formData.address.city}
+                                                onChange={e => handleInputChange('address', 'city', e.target.value)}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-700 font-medium"
+                                                data-testid="input-city"
+                                            />
+                                        </div>
+                                        <div className="group">
+                                            <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-primary-dark group-focus-within:text-primary transition-colors">Coastal Zip</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Code"
+                                                value={formData.address.zip}
+                                                onChange={e => handleInputChange('address', 'zip', e.target.value)}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-700 font-medium"
+                                                data-testid="input-zip"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="pt-4 flex justify-end">
+
+                                <div className="pt-10 flex justify-end">
                                     <button
                                         onClick={() => validateAddress() && setStep('payment')}
                                         disabled={!validateAddress()}
-                                        className="bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-bold transition-colors"
+                                        className="bg-primary hover:bg-primary-dark disabled:opacity-20 disabled:cursor-not-allowed text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-3"
                                         data-testid="next-to-payment"
                                     >
-                                        Next: Payment
+                                        Seal Logistics <ArrowRight className="w-5 h-5" />
                                     </button>
                                 </div>
                             </div>
                         )}
 
                         {step === 'payment' && (
-                            <div className="space-y-4 animate-fade-in">
-                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                    <CreditCard className="w-5 h-5 text-secondary" /> Payment Details
-                                </h2>
-
-                                <div className="bg-blue-900/20 text-blue-300 p-3 rounded text-sm mb-4">
-                                    <p>Check "Internal Chaos" validation rules.</p>
-                                </div>
-
+                            <div className="space-y-8 animate-fade-in">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1 text-muted">Card Number</label>
-                                    <input
-                                        type="text"
-                                        placeholder="0000 0000 0000 0000"
-                                        value={formData.payment.cardNumber}
-                                        onChange={e => handleInputChange('payment', 'cardNumber', e.target.value)}
-                                        className="w-full bg-background border border-white/10 rounded-lg p-3 focus:ring-2 focus:ring-secondary/50 outline-none font-mono"
-                                        maxLength={19}
-                                        data-testid="input-card"
-                                    />
+                                    <h2 className="text-3xl font-black text-white mb-2 tracking-tighter uppercase">Financial Settlement</h2>
+                                    <p className="text-slate-500 font-bold tracking-widest uppercase text-[10px]">Verify your credentials and authorize transfer</p>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1 text-muted">Expiry</label>
+
+                                <div className="bg-primary/5 border border-primary/20 text-primary-dark p-4 rounded-xl flex items-center gap-4">
+                                    <Ship className="w-5 h-5 flex-shrink-0" />
+                                    <p className="text-[10px] font-black uppercase tracking-wider">Fleet Standard Encryption Active.</p>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="group">
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-primary-dark group-focus-within:text-primary transition-colors">Credentials (Card No.)</label>
                                         <input
                                             type="text"
-                                            placeholder="MM/YY"
-                                            value={formData.payment.expiry}
-                                            onChange={e => handleInputChange('payment', 'expiry', e.target.value)}
-                                            className="w-full bg-background border border-white/10 rounded-lg p-3 focus:ring-2 focus:ring-secondary/50 outline-none"
-                                            data-testid="input-expiry"
+                                            placeholder="0000 0000 0000 0000"
+                                            value={formData.payment.cardNumber}
+                                            onChange={e => handleInputChange('payment', 'cardNumber', e.target.value)}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-700 font-mono tracking-widest"
+                                            maxLength={19}
+                                            data-testid="input-card"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1 text-muted">CVC</label>
-                                        <input
-                                            type="text"
-                                            placeholder="123"
-                                            value={formData.payment.cvc}
-                                            onChange={e => handleInputChange('payment', 'cvc', e.target.value)}
-                                            className="w-full bg-background border border-white/10 rounded-lg p-3 focus:ring-2 focus:ring-secondary/50 outline-none"
-                                            maxLength={3}
-                                            data-testid="input-cvc"
-                                        />
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div className="group">
+                                            <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-primary-dark group-focus-within:text-primary transition-colors">Term (Expiry)</label>
+                                            <input
+                                                type="text"
+                                                placeholder="MM / YY"
+                                                value={formData.payment.expiry}
+                                                onChange={e => handleInputChange('payment', 'expiry', e.target.value)}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-700"
+                                                data-testid="input-expiry"
+                                            />
+                                        </div>
+                                        <div className="group">
+                                            <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-primary-dark group-focus-within:text-primary transition-colors">Auth Code (CVC)</label>
+                                            <input
+                                                type="text"
+                                                placeholder="•••"
+                                                value={formData.payment.cvc}
+                                                onChange={e => handleInputChange('payment', 'cvc', e.target.value)}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-700"
+                                                maxLength={3}
+                                                data-testid="input-cvc"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-white/5 pt-10 mt-6 group">
+                                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-slate-500 group-focus-within:text-primary transition-colors">Admiralty Discount Code</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                placeholder="Enter secure voucher"
+                                                value={formData.discountCode}
+                                                onChange={e => setFormData(prev => ({ ...prev, discountCode: e.target.value }))}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all placeholder:text-slate-700 uppercase tracking-widest font-black"
+                                                data-testid="input-discount"
+                                            />
+                                            {formData.discountCode === 'FISKE20' && (
+                                                <p className="text-green-400 text-[10px] font-black uppercase tracking-widest mt-3 flex items-center gap-2">
+                                                    <CheckCircle className="w-3 h-3" /> 20% Garrison Rebate Authorized
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="border-t border-white/10 pt-4 mt-4">
-                                    <label className="block text-sm font-medium mb-1 text-muted">Discount Code</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            placeholder="Enter code"
-                                            value={formData.discountCode}
-                                            onChange={e => setFormData(prev => ({ ...prev, discountCode: e.target.value }))}
-                                            className="flex-1 bg-background border border-white/10 rounded-lg p-3 focus:ring-2 focus:ring-secondary/50 outline-none uppercase"
-                                            data-testid="input-discount"
-                                        />
-                                    </div>
-                                    {formData.discountCode === 'FISKE20' && (
-                                        <p className="text-green-400 text-xs mt-2">Discount applied: 20% off!</p>
-                                    )}
-                                </div>
-
-                                <div className="pt-4 flex justify-between">
+                                <div className="pt-10 flex items-center justify-between">
                                     <button
                                         onClick={() => setStep('address')}
-                                        className="text-muted hover:text-white px-4 py-2"
+                                        className="text-slate-500 hover:text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-colors px-4 py-2"
                                     >
-                                        Back
+                                        <ChevronLeft className="w-4 h-4" /> Re-route Logistics
                                     </button>
                                     <button
                                         onClick={handleSubmit}
                                         disabled={!validatePayment() || loading}
-                                        className="bg-secondary hover:bg-secondary/90 disabled:opacity-50 text-white px-8 py-3 rounded-lg font-bold flex items-center gap-2"
+                                        className="bg-primary hover:bg-primary-dark disabled:opacity-20 disabled:cursor-not-allowed text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-primary/30 flex items-center gap-4"
                                         data-testid="submit-order-btn"
                                     >
-                                        {loading ? 'Processing...' : `Pay $${formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}`}
+                                        {loading ? 'Processing...' : (
+                                            <>Authorize Transfer — ${formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}</>
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -252,27 +282,45 @@ export function CheckoutPage() {
                     </div>
                 </div>
 
-                <div className="md:col-span-1">
-                    <div className="bg-surface rounded-xl border border-white/5 p-6">
-                        <h3 className="font-bold mb-4">Order Summary</h3>
-                        <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
+                <div className="lg:col-span-4">
+                    <div className="glass-card rounded-3xl border border-white/10 p-8 sticky top-24 shadow-cyan-glow/5">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-primary-dark">Provision Manifest</h3>
+                        <div className="space-y-6 mb-10 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
                             {items.map(item => (
-                                <div key={item.id} className="flex justify-between text-sm">
-                                    <span className="text-muted">{item.quantity}x {item.name}</span>
-                                    <span className="font-medium">${item.price * item.quantity}</span>
+                                <div key={item.id} className="flex justify-between items-start gap-4">
+                                    <div className="flex-1">
+                                        <p className="text-white font-black text-xs leading-tight mb-1">{item.name}</p>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Qty: {item.quantity}</p>
+                                    </div>
+                                    <span className="font-black text-white text-sm tracking-tighter">${item.price * item.quantity}</span>
                                 </div>
                             ))}
                         </div>
-                        <div className="border-t border-white/10 pt-4 flex justify-between items-center font-bold text-lg">
-                            <span>Total</span>
-                            <span className="text-primary-foreground">${cartTotal}</span>
-                        </div>
-                        {formData.discountCode === 'FISKE20' && (
-                            <div className="flex justify-between items-center text-green-400 text-sm mt-2">
-                                <span>Discount (20%)</span>
-                                <span>-${Math.round(cartTotal * 0.2)}</span>
+
+                        <div className="space-y-4 border-t border-white/10 pt-8">
+                            <div className="flex justify-between items-center text-slate-500 font-bold text-[10px] uppercase tracking-widest">
+                                <span>Sub-Manifest Total</span>
+                                <span>${cartTotal}</span>
                             </div>
-                        )}
+                            {formData.discountCode === 'FISKE20' && (
+                                <div className="flex justify-between items-center text-green-400 font-black text-[10px] uppercase tracking-widest">
+                                    <span>Admiralty Rebate (20%)</span>
+                                    <span>-${Math.round(cartTotal * 0.2)}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between items-center pt-2">
+                                <span className="text-xs font-black text-white uppercase tracking-[0.2em]">Grand Total</span>
+                                <span className="text-3xl font-black text-white tracking-tighter" data-testid="cart-total">
+                                    ${formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
+                            <p className="text-[9px] text-slate-600 font-bold uppercase leading-relaxed text-center">
+                                By authorizing, you agree to the Admiralty's Terms of Engagement. No refunds on premium gear.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -284,16 +332,26 @@ function StepIndicator({ current, step, icon: Icon, label }: { current: Step; st
     const isActive = current === step;
     const isCompleted = (current === 'payment' && step === 'address') || (current === 'confirmation' && step !== 'confirmation');
 
-    let colorClass = 'text-slate-600 bg-slate-800';
-    if (isActive) colorClass = 'text-white bg-secondary';
-    if (isCompleted) colorClass = 'text-white bg-primary';
+    let containerClass = 'bg-white/5 border-white/5 text-slate-600';
+    let iconClass = 'text-slate-600';
+
+    if (isActive) {
+        containerClass = 'bg-white/10 border-white/20 text-white shadow-lg shadow-white/5 scale-110';
+        iconClass = 'text-primary';
+    }
+    if (isCompleted) {
+        containerClass = 'bg-primary/20 border-primary/40 text-primary';
+        iconClass = 'text-primary';
+    }
 
     return (
-        <div className="flex flex-col items-center gap-2">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${colorClass}`}>
-                <Icon className="w-5 h-5" />
+        <div className="flex flex-col items-center gap-3 transition-all duration-500">
+            <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all duration-500 ${containerClass}`}>
+                <Icon className={`w-6 h-6 transition-colors duration-500 ${iconClass}`} />
             </div>
-            <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-muted'}`}>{label}</span>
+            <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-500 ${isActive ? 'text-white' : 'text-slate-600'}`}>
+                {label}
+            </span>
         </div>
     );
 }
