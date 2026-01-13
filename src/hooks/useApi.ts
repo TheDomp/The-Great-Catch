@@ -13,6 +13,7 @@ export interface CheckoutData {
 export function useApi() {
     const { latencyMode, serverErrorMode, stockMismatchMode } = useChaos();
     const { user } = useAuth();
+    const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
     const simulateDelay = useCallback(async () => {
         const delay = latencyMode ? 2000 : 0;
@@ -36,7 +37,7 @@ export function useApi() {
     const getProducts = useCallback(async (category?: string, sort?: string): Promise<Product[]> => {
         await simulateDelay();
 
-        const url = new URL('/api/products', window.location.origin);
+        const url = new URL(`${API_BASE}/products`, window.location.origin);
         if (category) url.searchParams.append('category', category);
 
         const response = await fetch(url.toString());
@@ -53,7 +54,7 @@ export function useApi() {
 
     const getProduct = useCallback(async (id: string): Promise<Product> => {
         await simulateDelay();
-        const response = await fetch(`/api/products/${id}`);
+        const response = await fetch(`${API_BASE}/products/${id}`);
         return handleResponse(response);
     }, [simulateDelay, handleResponse]);
 
@@ -77,7 +78,7 @@ export function useApi() {
             discountCode: data.discountCode
         };
 
-        const response = await fetch('/api/orders', {
+        const response = await fetch(`${API_BASE}/orders`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(backendData)
@@ -94,7 +95,7 @@ export function useApi() {
 
     const updateProduct = useCallback(async (id: string, data: Partial<Product>): Promise<Product> => {
         await simulateDelay();
-        const response = await fetch(`/api/products/${id}`, {
+        const response = await fetch(`${API_BASE}/products/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -104,7 +105,7 @@ export function useApi() {
 
     const updateUser = useCallback(async (id: string, data: { name?: string; role?: string }): Promise<any> => {
         await simulateDelay();
-        const response = await fetch(`/api/users/${id}`, {
+        const response = await fetch(`${API_BASE}/users/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

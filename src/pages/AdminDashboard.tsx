@@ -41,6 +41,7 @@ export function AdminDashboard() {
     const { user, isAdmin, loading: authLoading } = useAuth();
     const { getProducts, updateProduct, updateUser } = useApi();
     const navigate = useNavigate();
+    const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
     const [activeTab, setActiveTab] = useState<Tab>('products');
     const [products, setProducts] = useState<Product[]>([]);
@@ -59,12 +60,12 @@ export function AdminDashboard() {
                 const data = await getProducts();
                 setProducts(data);
             } else if (activeTab === 'users') {
-                const response = await fetch('/api/users');
+                const response = await fetch(`${API_BASE}/users`);
                 const data = await response.json();
                 setUsers(data.users || []);
                 setCustomerCount(data.customerCount || 0);
             } else if (activeTab === 'orders') {
-                const response = await fetch('/api/orders');
+                const response = await fetch(`${API_BASE}/orders`);
                 const data = await response.json();
                 setOrders(data || []);
             }
@@ -101,7 +102,7 @@ export function AdminDashboard() {
         if (!window.confirm(`Are you sure you want to discharge ${userName} from the crew? This action is permanent.`)) return;
 
         try {
-            const response = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+            const response = await fetch(`${API_BASE}/users/${userId}`, { method: 'DELETE' });
             if (response.ok) {
                 alert(`${userName} has been removed from the manifest.`);
                 fetchData();
