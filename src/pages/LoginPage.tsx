@@ -121,13 +121,13 @@ export function LoginPage() {
                 <div className="mt-10 pt-8 border-t border-white/10 space-y-4">
                     <p className="text-center text-[10px] text-slate-500 font-black tracking-[0.2em] uppercase">Quick Access (Beta)</p>
                     <div className="grid grid-cols-2 gap-3">
-                        <button className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left" onClick={() => { setEmail('admin@test.se'); setPassword('Password123!'); }}>
+                        <button className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left" onClick={() => { setEmail('admin_v2@test.se'); setPassword('123qwe'); }}>
                             <p className="text-[10px] text-slate-500 font-bold uppercase">Admin</p>
-                            <p className="text-xs text-primary font-mono truncate">admin@test.se</p>
+                            <p className="text-xs text-primary font-mono truncate">admin_v2@test.se</p>
                         </button>
-                        <button className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left" onClick={() => { setEmail('customer@test.se'); setPassword('Password123!'); }}>
+                        <button className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left" onClick={() => { setEmail('customer_v2@test.se'); setPassword('123qwe'); }}>
                             <p className="text-[10px] text-slate-500 font-bold uppercase">Test User</p>
-                            <p className="text-xs text-primary font-mono truncate">customer@test.se</p>
+                            <p className="text-xs text-primary font-mono truncate">customer_v2@test.se</p>
                         </button>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useChaos } from '../context/ChaosContext';
-import { Settings, Zap, AlertTriangle, Clock, XCircle, ChevronUp, ChevronDown } from 'lucide-react';
+import { Zap, AlertTriangle, Clock, XCircle, ChevronUp, ChevronDown } from 'lucide-react';
 
 export function TesterControlPanel() {
     const {

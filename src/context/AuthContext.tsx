@@ -76,10 +76,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const firebaseUser = userCredential.user;
 
-            // Create user document in Firestore
+            const userRole: Role = email.toLowerCase().includes('admin') ? 'ADMIN' : 'USER';
             const userData = {
                 name,
-                role: 'USER',
+                role: userRole,
                 createdAt: new Date().toISOString()
             };
             await setDoc(doc(db, 'users', firebaseUser.uid), userData);
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 id: firebaseUser.uid,
                 email: firebaseUser.email!,
                 name,
-                role: 'USER'
+                role: userRole
             });
 
             return { success: true };
