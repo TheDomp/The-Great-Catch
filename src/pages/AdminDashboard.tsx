@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApi } from '../hooks/useApi';
@@ -6,6 +6,9 @@ import type { Product } from '../data/mockData';
 import { Edit, Trash2, Plus, AlertTriangle, Search, Ship, Users, Package, ShoppingCart } from 'lucide-react';
 import { EditProductModal } from '../components/EditProductModal';
 import { EditUserModal } from '../components/EditUserModal';
+import { collection, getDocs, deleteDoc, doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { PRODUCTS } from '../data/mockData';
 
 interface UserData {
     id: string;
@@ -41,7 +44,6 @@ export function AdminDashboard() {
     const { user, isAdmin, loading: authLoading } = useAuth();
     const { getProducts, updateProduct, updateUser } = useApi();
     const navigate = useNavigate();
-    const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
     const [activeTab, setActiveTab] = useState<Tab>('products');
     const [products, setProducts] = useState<Product[]>([]);
@@ -53,28 +55,28 @@ export function AdminDashboard() {
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [editingUser, setEditingUser] = useState<UserData | null>(null);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             if (activeTab === 'products') {
                 const data = await getProducts();
                 setProducts(data);
             } else if (activeTab === 'users') {
-                const response = await fetch(`${API_BASE}/users`);
-                const data = await response.json();
-                setUsers(data.users || []);
-                setCustomerCount(data.customerCount || 0);
+                const querySnapshot = await getDocs(collection(db, 'users'));
+                const usersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as UserData));
+                setUsers(usersList);
+                setCustomerCount(usersList.filter(u => u.role !== 'ADMIN').length);
             } else if (activeTab === 'orders') {
-                const response = await fetch(`${API_BASE}/orders`);
-                const data = await response.json();
-                setOrders(data || []);
+                const querySnapshot = await getDocs(collection(db, 'orders'));
+                const ordersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as OrderData));
+                setOrders(ordersList);
             }
         } catch (err) {
             console.error(err);
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeTab, getProducts]);
 
     useEffect(() => {
         if (!authLoading) {
@@ -84,7 +86,7 @@ export function AdminDashboard() {
             }
             fetchData();
         }
-    }, [isAdmin, authLoading, navigate, getProducts, activeTab]);
+    }, [isAdmin, authLoading, navigate, activeTab, fetchData]);
 
     const handleSaveProduct = async (data: Partial<Product>) => {
         if (editingProduct) {
@@ -102,16 +104,29 @@ export function AdminDashboard() {
         if (!window.confirm(`Are you sure you want to discharge ${userName} from the crew? This action is permanent.`)) return;
 
         try {
-            const response = await fetch(`${API_BASE}/users/${userId}`, { method: 'DELETE' });
-            if (response.ok) {
-                alert(`${userName} has been removed from the manifest.`);
-                fetchData();
-            } else {
-                const data = await response.json();
-                alert(data.error || 'Failed to remove crew member.');
-            }
+            await deleteDoc(doc(db, 'users', userId));
+            alert(`${userName} has been removed from the manifest.`);
+            fetchData();
         } catch (err) {
-            alert('A storm blocked the request. Try again.');
+            alert('Failed to remove crew member.');
+        }
+    };
+
+    const handleSeedDatabase = async () => {
+        if (!window.confirm('This will restore all default products to the inventory. Continue?')) return;
+        setLoading(true);
+        try {
+            for (const product of PRODUCTS) {
+                const { id, ...rest } = product;
+                await setDoc(doc(db, 'products', id), rest);
+            }
+            alert('Inventory restored successfully!');
+            fetchData();
+        } catch (err) {
+            console.error(err);
+            alert('Failed to restore inventory.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -122,11 +137,11 @@ export function AdminDashboard() {
 
     const filteredUsers = users.filter(u =>
         u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (u.email && u.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const filteredOrders = orders.filter(o =>
-        o.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (o.user && o.user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         o.id.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -142,14 +157,24 @@ export function AdminDashboard() {
                     </h1>
                     <p className="text-primary-dark font-bold uppercase tracking-[0.2em] text-xs mt-2">Fleet Management Operations</p>
                 </div>
-                {activeTab === 'products' && (
-                    <button
-                        className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest flex items-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
-                        onClick={() => alert('New gear request sent to the dock.')}
-                    >
-                        <Plus className="w-5 h-5" /> Commission Gear
-                    </button>
-                )}
+                <div className="flex gap-4">
+                    {activeTab === 'products' && (
+                        <>
+                            <button
+                                className="bg-white/5 hover:bg-white/10 text-slate-400 px-6 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 border border-white/10"
+                                onClick={handleSeedDatabase}
+                            >
+                                Restore Defaults
+                            </button>
+                            <button
+                                className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest flex items-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                                onClick={() => alert('New gear request sent to the dock.')}
+                            >
+                                <Plus className="w-5 h-5" /> Commission Gear
+                            </button>
+                        </>
+                    )}
+                </div>
             </div>
 
             {/* Tabs */}

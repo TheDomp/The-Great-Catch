@@ -1,7 +1,16 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    deleteUser
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
-type Role = 'GUEST' | 'USER' | 'ADMIN';
+type Role = 'USER' | 'ADMIN';
 
 interface User {
     id: string;
@@ -15,7 +24,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<boolean>;
     register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
     deleteAccount: () => Promise<boolean>;
-    logout: () => void;
+    logout: () => Promise<void>;
     isAuthenticated: boolean;
     isAdmin: boolean;
     loading: boolean;
@@ -27,33 +36,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const saved = localStorage.getItem('tgc_user');
-        if (saved) {
-            try {
-                setUser(JSON.parse(saved));
-            } catch (e) {
-                console.error('Failed to parse saved user', e);
-            }
+    const fetchUserData = useCallback(async (uid: string, email: string) => {
+        const userDoc = await getDoc(doc(db, 'users', uid));
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUser({
+                id: uid,
+                email: email,
+                name: data.name || 'Unknown',
+                role: data.role || 'USER'
+            });
         }
-        setLoading(false);
     }, []);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                await fetchUserData(firebaseUser.uid, firebaseUser.email!);
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
+        return () => unsubscribe();
+    }, [fetchUserData]);
 
     const login = useCallback(async (email: string, password: string): Promise<boolean> => {
         try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-
-            if (!response.ok) {
-                return false;
-            }
-
-            const data = await response.json();
-            setUser(data.user);
-            localStorage.setItem('tgc_user', JSON.stringify(data.user));
+            await signInWithEmailAndPassword(auth, email, password);
             return true;
         } catch (error) {
             console.error('Login error:', error);
@@ -63,48 +73,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const register = useCallback(async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
         try {
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, name })
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const firebaseUser = userCredential.user;
+
+            // Create user document in Firestore
+            const userData = {
+                name,
+                role: 'USER',
+                createdAt: new Date().toISOString()
+            };
+            await setDoc(doc(db, 'users', firebaseUser.uid), userData);
+
+            setUser({
+                id: firebaseUser.uid,
+                email: firebaseUser.email!,
+                name,
+                role: 'USER'
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                return { success: false, error: data.error || 'Registration failed' };
-            }
-
-            setUser(data.user);
-            localStorage.setItem('tgc_user', JSON.stringify(data.user));
             return { success: true };
-        } catch (error) {
+        } catch (error: any) {
             console.error('Register error:', error);
-            return { success: false, error: 'Network error or server down' };
+            return { success: false, error: error.message || 'Registration failed' };
         }
     }, []);
 
-    const deleteAccount = useCallback(async (): Promise<boolean> => {
-        if (!user) return false;
-        try {
-            const response = await fetch(`/api/users/${user.id}`, {
-                method: 'DELETE'
-            });
+    const logout = useCallback(async () => {
+        await signOut(auth);
+    }, []);
 
-            if (response.ok) {
-                logout();
-                return true;
-            }
-            return false;
+    const deleteAccount = useCallback(async (): Promise<boolean> => {
+        if (!auth.currentUser) return false;
+        try {
+            await deleteUser(auth.currentUser);
+            setUser(null);
+            return true;
         } catch (error) {
             console.error('Delete account error:', error);
             return false;
         }
-    }, [user]);
-
-    const logout = useCallback(() => {
-        setUser(null);
-        localStorage.removeItem('tgc_user');
     }, []);
 
     const value = useMemo(() => ({
