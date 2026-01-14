@@ -8,8 +8,9 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#00B4D8', // Vibrant Cyan
-          dark: '#0077B6',
+          DEFAULT: '#0369A1', // Darker Sky Blue for contrast (WCAG AA pass with white)
+          dark: '#075985',
+          light: '#7DD3FC', // For contrast on dark backgrounds
           foreground: '#FFFFFF',
         },
         secondary: {
@@ -17,10 +18,10 @@ export default {
           foreground: '#F8FAFC',
         },
         accent: '#FFD700', // Gold for premium touches
-        background: '#03045E', // Deep Ocean Blue
+        background: '#1E3A8A', // Indigo Blue (lighter)
         surface: '#023E8A', // Strong Blue
         'surface-light': '#0077B6',
-        muted: '#94A3B8',
+        muted: '#CBD5E1', // Slate-300 for higher contrast
       },
       backgroundImage: {
         'ocean-gradient': 'linear-gradient(135deg, #03045E 0%, #0077B6 100%)',

@@ -14,7 +14,7 @@ export function CartPage() {
                 <h2 className="text-4xl font-black mb-4 tracking-tighter text-white uppercase">Vessel Empty</h2>
                 <p className="text-slate-500 font-bold tracking-widest uppercase text-xs mb-10">No premium gear currently loaded.</p>
                 <Link to="/" className="inline-block bg-primary hover:bg-primary-dark text-white px-10 py-4 rounded-xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-primary/20">
-                    Sails to the Shop
+                    Sail to Shop
                 </Link>
             </div>
         );
@@ -38,7 +38,7 @@ export function CartPage() {
                             <div className="flex-1 text-center md:text-left">
                                 <Link to={`/product/${item.id}`} className="font-black text-xl hover:text-primary transition-colors tracking-tight text-white block mb-1">{item.name}</Link>
                                 <p className="text-primary-dark font-black text-[10px] uppercase tracking-widest">{item.category}</p>
-                                <span className="font-black text-white md:hidden mt-4 block text-2xl">${item.price}</span>
+                                <span className="font-black text-white md:hidden mt-4 block text-2xl">€{item.price}</span>
                             </div>
 
                             <div className="flex items-center gap-6 bg-white/5 border border-white/10 p-2 rounded-2xl">
@@ -60,8 +60,8 @@ export function CartPage() {
                             </div>
 
                             <div className="text-right hidden md:block min-w-[120px]">
-                                <p className="font-black text-2xl text-white tracking-tighter">${item.price * item.quantity}</p>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Valuation</p>
+                                <p className="font-black text-2xl text-white tracking-tighter">€{item.price * item.quantity}</p>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Subtotal</p>
                             </div>
 
                             <button
@@ -77,8 +77,8 @@ export function CartPage() {
 
                 <div className="p-8 bg-white/10 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="flex flex-col items-center md:items-start">
-                        <span className="text-primary-dark font-black text-[10px] uppercase tracking-[0.3em] mb-1">Fleet Total</span>
-                        <span className="font-black text-5xl text-white tracking-tighter shadow-primary/20 drop-shadow-lg" data-testid="cart-total">${cartTotal}</span>
+                        <span className="text-primary-dark font-black text-[10px] uppercase tracking-[0.3em] mb-1">Total</span>
+                        <span className="font-black text-5xl text-white tracking-tighter shadow-primary/20 drop-shadow-lg" data-testid="cart-total">€{cartTotal}</span>
                     </div>
 
                     <div className="flex gap-4 w-full md:w-auto">
@@ -93,7 +93,7 @@ export function CartPage() {
                             className="flex-1 md:flex-none bg-primary hover:bg-primary-dark text-white px-10 py-5 rounded-2xl font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-primary/30"
                             data-testid="checkout-btn"
                         >
-                            Proceed to Garrison <ArrowRight className="w-5 h-5" />
+                            Proceed to Checkout <ArrowRight className="w-5 h-5" />
                         </Link>
                     </div>
                 </div>

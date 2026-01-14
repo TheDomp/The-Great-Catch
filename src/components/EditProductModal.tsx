@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Save, Package, Tag, DollarSign, List } from 'lucide-react';
+import { X, Save, Package, Tag, List } from 'lucide-react';
 import type { Product } from '../data/mockData';
 
 interface EditProductModalProps {
@@ -13,6 +13,8 @@ export function EditProductModal({ product, onClose, onSave }: EditProductModalP
     const [price, setPrice] = useState(product.price);
     const [stock, setStock] = useState(product.stock);
     const [category, setCategory] = useState(product.category);
+    const [description, setDescription] = useState(product.description);
+    const [image, setImage] = useState(product.image);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -21,7 +23,7 @@ export function EditProductModal({ product, onClose, onSave }: EditProductModalP
         setLoading(true);
         setError(null);
         try {
-            await onSave({ name, price, stock, category });
+            await onSave({ name, price, stock, category, description, image });
             onClose();
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Fleet message intercepted: Failed to update gear.');
@@ -50,7 +52,7 @@ export function EditProductModal({ product, onClose, onSave }: EditProductModalP
                         </div>
                     )}
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
                         <div>
                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 block">Gear Designation</label>
                             <div className="relative group">
@@ -65,11 +67,22 @@ export function EditProductModal({ product, onClose, onSave }: EditProductModalP
                             </div>
                         </div>
 
+                        <div>
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 block">Mission Intel (Description)</label>
+                            <textarea
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all text-white min-h-[100px] resize-none"
+                                required
+                                placeholder="Details about this gear..."
+                            />
+                        </div>
+
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 block">Valuation ($)</label>
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 block">Valuation (€)</label>
                                 <div className="relative group">
-                                    <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary transition-colors" />
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">€</span>
                                     <input
                                         type="number"
                                         value={price}
@@ -112,6 +125,17 @@ export function EditProductModal({ product, onClose, onSave }: EditProductModalP
                                 </select>
                             </div>
                         </div>
+
+                        <div>
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 block">Visual Signal (Image URL)</label>
+                            <input
+                                type="text"
+                                value={image}
+                                onChange={(e) => setImage(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white/10 transition-all text-white"
+                                placeholder="/images/rod.png"
+                            />
+                        </div>
                     </div>
 
                     <div className="pt-4 flex gap-4">
@@ -138,5 +162,6 @@ export function EditProductModal({ product, onClose, onSave }: EditProductModalP
                 </form>
             </div>
         </div>
+
     );
 }

@@ -32,7 +32,7 @@ export function Shop() {
         };
 
         fetchProducts();
-    }, [category, sort]);
+    }, [category, sort, getProducts]);
 
     const handleCategoryChange = (cat: string) => {
         setSearchParams(prev => {
@@ -89,6 +89,22 @@ export function Shop() {
                         {Array.from({ length: 9 }).map((_, i) => (
                             <ProductCardSkeleton key={i} />
                         ))}
+                    </div>
+                ) : products.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-24 text-center" data-testid="no-results">
+                        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <AlertTriangle className="w-10 h-10 text-primary/50" />
+                        </div>
+                        <h2 className="text-2xl font-black text-white mb-2">No Gear Found</h2>
+                        <p className="text-slate-500 text-sm max-w-sm">
+                            We couldn't find any products matching your selection. Try a different category or clear filters.
+                        </p>
+                        <button
+                            onClick={() => handleCategoryChange('')}
+                            className="mt-6 px-6 py-3 bg-primary/20 hover:bg-primary text-white rounded-xl font-bold transition-all"
+                        >
+                            View All Gear
+                        </button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

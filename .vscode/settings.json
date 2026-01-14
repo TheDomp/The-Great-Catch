@@ -1,0 +1,9 @@
+{
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#d97706",
+        "statusBar.foreground": "#ffffff",
+        "statusBar.noFolderBackground": "#d97706"
+    },
+    "playwright.reuseBrowser": false,
+    "editor.formatOnSave": true
+}

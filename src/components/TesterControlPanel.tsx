@@ -19,6 +19,7 @@ export function TesterControlPanel() {
                     onClick={() => setIsExpanded(!isExpanded)}
                     className="w-full flex items-center justify-between p-3 bg-slate-800 hover:bg-slate-700 transition-colors"
                     data-testid="chaos-toggle-btn"
+                    aria-label={isExpanded ? "Collapse Chaos Engine" : "Expand Chaos Engine"}
                 >
                     <div className="flex items-center gap-2">
                         <Zap className={`w-5 h-5 ${isExpanded ? 'text-secondary' : 'text-slate-400'}`} />

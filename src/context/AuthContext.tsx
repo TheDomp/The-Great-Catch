@@ -1,14 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    deleteUser
-} from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
 
 type Role = 'USER' | 'ADMIN';
 
@@ -36,34 +27,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const fetchUserData = useCallback(async (uid: string, email: string) => {
-        const userDoc = await getDoc(doc(db, 'users', uid));
-        if (userDoc.exists()) {
-            const data = userDoc.data();
-            setUser({
-                id: uid,
-                email: email,
-                name: data.name || 'Unknown',
-                role: data.role || 'USER'
-            });
-        }
-    }, []);
-
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            if (firebaseUser) {
-                await fetchUserData(firebaseUser.uid, firebaseUser.email!);
-            } else {
-                setUser(null);
-            }
-            setLoading(false);
-        });
-        return () => unsubscribe();
-    }, [fetchUserData]);
+        const storedUser = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        if (storedUser && token) {
+            setUser(JSON.parse(storedUser));
+        }
+        setLoading(false);
+    }, []);
 
     const login = useCallback(async (email: string, password: string): Promise<boolean> => {
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) return false;
+
+            const data = await response.json();
+            setUser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
             return true;
         } catch (error) {
             console.error('Login error:', error);
@@ -73,46 +59,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const register = useCallback(async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const firebaseUser = userCredential.user;
-
-            const userRole: Role = email.toLowerCase().includes('admin') ? 'ADMIN' : 'USER';
-            const userData = {
-                name,
-                role: userRole,
-                createdAt: new Date().toISOString()
-            };
-            await setDoc(doc(db, 'users', firebaseUser.uid), userData);
-
-            setUser({
-                id: firebaseUser.uid,
-                email: firebaseUser.email!,
-                name,
-                role: userRole
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, name })
             });
 
+            const data = await response.json();
+            if (!response.ok) return { success: false, error: data.error };
+
+            setUser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
             return { success: true };
         } catch (error: any) {
             console.error('Register error:', error);
-            return { success: false, error: error.message || 'Registration failed' };
+            return { success: false, error: 'The sea is too rough. Try again later.' };
         }
     }, []);
 
     const logout = useCallback(async () => {
-        await signOut(auth);
+        setUser(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
     }, []);
 
     const deleteAccount = useCallback(async (): Promise<boolean> => {
-        if (!auth.currentUser) return false;
+        if (!user) return false;
         try {
-            await deleteUser(auth.currentUser);
-            setUser(null);
-            return true;
+            const response = await fetch(`/api/users/${user.id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            if (response.ok) {
+                await logout();
+                return true;
+            }
+            return false;
         } catch (error) {
             console.error('Delete account error:', error);
             return false;
         }
-    }, []);
+    }, [user, logout]);
 
     const value = useMemo(() => ({
         user,

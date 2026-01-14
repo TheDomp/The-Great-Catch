@@ -1,0 +1,23 @@
+{
+    "customer": {
+        "email": "customer@test.se",
+        "password": "Password123!",
+        "name": "Test Customer",
+        "address": {
+            "street": "Fiskarvägen 12",
+            "city": "Göteborg",
+            "zip": "411 11"
+        },
+        "payment": {
+            "cardNumber": "1234567812345678",
+            "expiry": "12/26",
+            "cvc": "123"
+        },
+        "discountCode": "FISKE20"
+    },
+    "admin": {
+        "email": "admin@test.se",
+        "password": "Password123!",
+        "name": "Admin User"
+    }
+}

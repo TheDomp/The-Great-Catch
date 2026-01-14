@@ -9,11 +9,12 @@ export function Layout() {
     // Prevent flicker while restoring auth state from localStorage
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <div className="text-primary font-black animate-pulse tracking-widest uppercase text-sm">
+            <main className="min-h-screen flex items-center justify-center bg-background" aria-busy="true">
+                <h1 className="sr-only">Initial Loading</h1>
+                <div className="text-sky-300 font-black animate-pulse tracking-widest uppercase text-sm">
                     Initializing Fleet...
                 </div>
-            </div>
+            </main>
         );
     }
 

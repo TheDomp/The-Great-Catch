@@ -1,0 +1,47 @@
+{
+    "categories": [
+        "rod",
+        "reel",
+        "lure",
+        "clothing"
+    ],
+    "products": [
+        {
+            "id": "rod-1",
+            "name": "Pro Caster X",
+            "category": "rod",
+            "price": 199,
+            "image": "/images/rod.png",
+            "description": "Precision engineered rod for professional casting.",
+            "stock": 10
+        },
+        {
+            "id": "reel-1",
+            "name": "Spin Doctor 500",
+            "category": "reel",
+            "price": 249,
+            "image": "/images/reel.png",
+            "description": "Smooth drag system for long battles.",
+            "stock": 5
+        }
+    ],
+    "testUsers": [
+        {
+            "role": "customer",
+            "email": "customer@test.se",
+            "password": "Password123!",
+            "profile": {
+                "firstName": "Kim",
+                "lastName": "Fisher",
+                "address": "Fiskmåsgatan 1",
+                "city": "Havet",
+                "zip": "12345"
+            }
+        },
+        {
+            "role": "admin",
+            "email": "admin@test.se",
+            "password": "Password123!"
+        }
+    ]
+}

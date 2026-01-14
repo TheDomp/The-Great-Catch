@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Lock, Mail, AlertCircle, Loader2, Anchor } from 'lucide-react';
 
 export function LoginPage() {
     const { login, isAuthenticated, isAdmin, loading: authLoading } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const redirectTo = searchParams.get('redirectTo');
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -14,13 +16,15 @@ export function LoginPage() {
 
     useEffect(() => {
         if (!authLoading && isAuthenticated) {
-            if (isAdmin) {
+            if (redirectTo) {
+                navigate(redirectTo);
+            } else if (isAdmin) {
                 navigate('/admin');
             } else {
                 navigate('/');
             }
         }
-    }, [isAuthenticated, isAdmin, authLoading, navigate]);
+    }, [isAuthenticated, isAdmin, authLoading, navigate, redirectTo]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,10 +47,11 @@ export function LoginPage() {
 
     if (authLoading) {
         return (
-            <div className="flex flex-col items-center justify-center py-20">
+            <main className="flex flex-col items-center justify-center py-20" aria-busy="true">
+                <h1 className="sr-only">Analyzing credentials</h1>
                 <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
                 <p className="text-muted">Analyzing credentials...</p>
-            </div>
+            </main>
         );
     }
 
@@ -60,6 +65,7 @@ export function LoginPage() {
                 </div>
 
                 <h1 className="text-3xl font-black mb-2 text-center text-white tracking-tighter">SURFACE AGAIN</h1>
+                <span data-testid="code-version-marker" className="sr-only">v2.1-contrast-fix</span>
                 <p className="text-muted text-center mb-10 text-sm">Log in to access your dashboard</p>
 
                 {error && (
@@ -80,6 +86,7 @@ export function LoginPage() {
                                 onChange={e => setEmail(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-slate-600"
                                 placeholder="captain@vessel.com"
+                                data-testid="login-email"
                                 required
                             />
                         </div>
@@ -95,6 +102,7 @@ export function LoginPage() {
                                 onChange={e => setPassword(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all placeholder:text-slate-600"
                                 placeholder="••••••••"
+                                data-testid="login-password"
                                 required
                             />
                         </div>
@@ -103,7 +111,7 @@ export function LoginPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-primary hover:bg-primary-dark disabled:opacity-50 text-white py-4 rounded-xl font-black uppercase tracking-widest transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
+                        className="w-full bg-[#0369A1] hover:bg-[#075985] disabled:opacity-50 text-white py-4 rounded-xl font-black uppercase tracking-widest transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
                     >
                         {isSubmitting ? 'VERIFYING...' : 'SIGN IN'}
                     </button>
@@ -121,13 +129,21 @@ export function LoginPage() {
                 <div className="mt-10 pt-8 border-t border-white/10 space-y-4">
                     <p className="text-center text-[10px] text-slate-500 font-black tracking-[0.2em] uppercase">Quick Access (Beta)</p>
                     <div className="grid grid-cols-2 gap-3">
-                        <button className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left" onClick={() => { setEmail('admin_v2@test.se'); setPassword('123qwe'); }}>
+                        <button
+                            className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left"
+                            onClick={() => { setEmail('admin@test.se'); setPassword('Password123!'); }}
+                            aria-label="Login as Admin"
+                        >
                             <p className="text-[10px] text-slate-500 font-bold uppercase">Admin</p>
-                            <p className="text-xs text-primary font-mono truncate">admin_v2@test.se</p>
+                            <p className="text-xs text-primary font-mono truncate">admin@test.se</p>
                         </button>
-                        <button className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left" onClick={() => { setEmail('customer_v2@test.se'); setPassword('123qwe'); }}>
+                        <button
+                            className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left"
+                            onClick={() => { setEmail('customer@test.se'); setPassword('Password123!'); }}
+                            aria-label="Login as Test User"
+                        >
                             <p className="text-[10px] text-slate-500 font-bold uppercase">Test User</p>
-                            <p className="text-xs text-primary font-mono truncate">customer_v2@test.se</p>
+                            <p className="text-xs text-primary font-mono truncate">customer@test.se</p>
                         </button>
                     </div>
                 </div>

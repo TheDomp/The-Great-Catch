@@ -2,17 +2,6 @@ import { useMemo, useCallback } from 'react';
 import { useChaos } from '../context/ChaosContext';
 import { useAuth } from '../context/AuthContext';
 import type { Product } from '../data/mockData';
-import {
-    collection,
-    getDocs,
-    getDoc,
-    doc,
-    addDoc,
-    updateDoc,
-    query,
-    where
-} from 'firebase/firestore';
-import { db } from '../firebase';
 
 export interface CheckoutData {
     items: { id: string; quantity: number }[];
@@ -38,19 +27,20 @@ export function useApi() {
     const getProducts = useCallback(async (category?: string, sort?: string): Promise<Product[]> => {
         await simulateDelay();
 
-        let q = query(collection(db, 'products'));
+        const params = new URLSearchParams();
+        if (category) params.append('category', category);
+        if (sort) params.append('sort', sort);
 
-        if (category) {
-            q = query(q, where('category', '==', category));
-        }
+        const response = await fetch(`/api/products?${params.toString()}`);
+        if (!response.ok) throw new Error('Failed to fetch products');
 
-        const querySnapshot = await getDocs(q);
-        let products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+        let products = await response.json();
 
+        // Sort remains client-side if not supported by backend exactly as requested
         if (sort === 'price-asc') {
-            products.sort((a, b) => a.price - b.price);
+            products.sort((a: Product, b: Product) => a.price - b.price);
         } else if (sort === 'price-desc') {
-            products.sort((a, b) => b.price - a.price);
+            products.sort((a: Product, b: Product) => b.price - a.price);
         }
 
         return products;
@@ -58,61 +48,75 @@ export function useApi() {
 
     const getProduct = useCallback(async (id: string): Promise<Product> => {
         await simulateDelay();
-        const docRef = doc(db, 'products', id);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data() } as Product;
-        } else {
-            throw new Error('Product not found');
-        }
+        const response = await fetch(`/api/products/${id}`);
+        if (!response.ok) throw new Error('Product not found');
+        return await response.json();
     }, [simulateDelay]);
 
     const checkout = useCallback(async (data: CheckoutData): Promise<{ success: true; orderId: string; total: number }> => {
         await simulateDelay();
 
         if (stockMismatchMode) {
-            throw new Error('Out of Stock: One or more items are unavailable (Chaos Mode)');
+            throw new Error('Mission Aborted: Critical stock depletion detected in designated sector.');
         }
 
         if (!user) {
             throw new Error('You must be logged in to checkout');
         }
 
-        const total = data.items.reduce((acc, item) => acc + (item.quantity * 100), 0); // Simplified total for now
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+                userId: user.id,
+                items: data.items.map(item => ({ productId: item.id, quantity: item.quantity })),
+                discountCode: data.discountCode
+            })
+        });
 
-        const orderData = {
-            userId: user.id,
-            userName: user.name,
-            items: data.items,
-            total,
-            status: 'PENDING',
-            createdAt: new Date().toISOString(),
-            address: data.address
-        };
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Checkout failed');
+        }
 
-        const docRef = await addDoc(collection(db, 'orders'), orderData);
+        const order = await response.json();
 
         return {
             success: true,
-            orderId: docRef.id,
-            total
+            orderId: order.id,
+            total: order.total
         };
     }, [simulateDelay, stockMismatchMode, user]);
 
     const updateProduct = useCallback(async (id: string, data: Partial<Product>): Promise<Product> => {
         await simulateDelay();
-        const docRef = doc(db, 'products', id);
-        await updateDoc(docRef, data);
-        const updatedSnap = await getDoc(docRef);
-        return { id: updatedSnap.id, ...updatedSnap.data() } as Product;
+        const response = await fetch(`/api/products/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to update product');
+        return await response.json();
     }, [simulateDelay]);
 
     const updateUser = useCallback(async (id: string, data: { name?: string; role?: string }): Promise<any> => {
         await simulateDelay();
-        const docRef = doc(db, 'users', id);
-        await updateDoc(docRef, data);
-        return { id, ...data };
+        const response = await fetch(`/api/users/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Failed to update user');
+        return await response.json();
     }, [simulateDelay]);
 
     return useMemo(() => ({

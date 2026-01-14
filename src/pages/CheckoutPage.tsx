@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../context/AuthContext';
 import type { CheckoutData } from '../hooks/useApi';
 import { CheckCircle, CreditCard, MapPin, AlertCircle, Anchor, Ship, ArrowRight, ChevronLeft } from 'lucide-react';
 
@@ -10,19 +11,34 @@ type Step = 'address' | 'payment' | 'confirmation';
 export function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart();
     const { checkout } = useApi();
+    const { isAuthenticated, loading: authLoading } = useAuth();
+    const navigate = useNavigate();
 
     const [step, setStep] = useState<Step>('address');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
     const [formData, setFormData] = useState<CheckoutData>({
         items: [],
         address: { street: '', city: '', zip: '' },
         payment: { cardNumber: '', expiry: '', cvc: '' },
         discountCode: ''
     });
-
     const [orderDetails, setOrderDetails] = useState<{ id: string; total: number } | null>(null);
+
+    useEffect(() => {
+        if (!authLoading && !isAuthenticated) {
+            navigate('/login?redirectTo=/checkout');
+        }
+    }, [isAuthenticated, authLoading, navigate]);
+
+    if (authLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center py-32 text-white">
+                <Ship className="w-12 h-12 animate-bounce text-primary/40 mb-4" />
+                <p className="font-black uppercase tracking-widest text-xs">Synchronizing Manifest...</p>
+            </div>
+        );
+    }
 
     if (items.length === 0 && !orderDetails) {
         return (
@@ -96,7 +112,7 @@ export function CheckoutPage() {
                         <div className="flex justify-between items-end">
                             <div>
                                 <p className="text-[10px] text-primary-dark font-black uppercase tracking-[0.2em] mb-1">Final Settlement</p>
-                                <p className="font-black text-5xl text-white tracking-tighter">${orderDetails.total}</p>
+                                <p className="font-black text-5xl text-white tracking-tighter">€{orderDetails.total}</p>
                             </div>
                             <Anchor className="w-16 h-16 text-primary/10" />
                         </div>
@@ -273,7 +289,7 @@ export function CheckoutPage() {
                                         data-testid="submit-order-btn"
                                     >
                                         {loading ? 'Processing...' : (
-                                            <>Authorize Transfer — ${formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}</>
+                                            <>Authorize Transfer — €{formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}</>
                                         )}
                                     </button>
                                 </div>
@@ -292,7 +308,7 @@ export function CheckoutPage() {
                                         <p className="text-white font-black text-xs leading-tight mb-1">{item.name}</p>
                                         <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Qty: {item.quantity}</p>
                                     </div>
-                                    <span className="font-black text-white text-sm tracking-tighter">${item.price * item.quantity}</span>
+                                    <span className="font-black text-white text-sm tracking-tighter">€{item.price * item.quantity}</span>
                                 </div>
                             ))}
                         </div>
@@ -300,18 +316,18 @@ export function CheckoutPage() {
                         <div className="space-y-4 border-t border-white/10 pt-8">
                             <div className="flex justify-between items-center text-slate-500 font-bold text-[10px] uppercase tracking-widest">
                                 <span>Sub-Manifest Total</span>
-                                <span>${cartTotal}</span>
+                                <span>€{cartTotal}</span>
                             </div>
                             {formData.discountCode === 'FISKE20' && (
                                 <div className="flex justify-between items-center text-green-400 font-black text-[10px] uppercase tracking-widest">
                                     <span>Admiralty Rebate (20%)</span>
-                                    <span>-${Math.round(cartTotal * 0.2)}</span>
+                                    <span>-€{Math.round(cartTotal * 0.2)}</span>
                                 </div>
                             )}
                             <div className="flex justify-between items-center pt-2">
                                 <span className="text-xs font-black text-white uppercase tracking-[0.2em]">Grand Total</span>
                                 <span className="text-3xl font-black text-white tracking-tighter" data-testid="cart-total">
-                                    ${formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}
+                                    €{formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}
                                 </span>
                             </div>
                         </div>

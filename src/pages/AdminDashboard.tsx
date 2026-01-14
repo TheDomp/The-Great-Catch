@@ -53,6 +53,7 @@ export function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [isAddingProduct, setIsAddingProduct] = useState(false);
     const [editingUser, setEditingUser] = useState<UserData | null>(null);
 
     const fetchData = useCallback(async () => {
@@ -91,6 +92,16 @@ export function AdminDashboard() {
     const handleSaveProduct = async (data: Partial<Product>) => {
         if (editingProduct) {
             await updateProduct(editingProduct.id, data);
+            fetchData();
+        } else if (isAddingProduct) {
+            // New gear commissioning
+            const newId = `${data.category || 'gear'}-${Date.now()}`;
+            await setDoc(doc(db, 'products', newId), {
+                ...data,
+                id: newId,
+                reviews: []
+            });
+            setIsAddingProduct(false);
             fetchData();
         }
     };
@@ -168,7 +179,7 @@ export function AdminDashboard() {
                             </button>
                             <button
                                 className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest flex items-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
-                                onClick={() => alert('New gear request sent to the dock.')}
+                                onClick={() => setIsAddingProduct(true)}
                             >
                                 <Plus className="w-5 h-5" /> Commission Gear
                             </button>
@@ -284,7 +295,7 @@ export function AdminDashboard() {
                                                     {product.category}
                                                 </span>
                                             </td>
-                                            <td className="p-6 font-black text-white">${product.price}</td>
+                                            <td className="p-6 font-black text-white">€{product.price}</td>
                                             <td className="p-6">
                                                 <div className="flex items-center gap-2.5">
                                                     <span className={`w-2.5 h-2.5 rounded-full ${product.stock < 5 ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`} />
@@ -418,7 +429,7 @@ export function AdminDashboard() {
                                                     ))}
                                                 </div>
                                             </td>
-                                            <td className="p-6 font-black text-white">${order.total}</td>
+                                            <td className="p-6 font-black text-white">€{order.total}</td>
                                             <td className="p-6 text-slate-400 text-sm">
                                                 {new Date(order.createdAt).toLocaleString('sv-SE', {
                                                     dateStyle: 'short',
@@ -439,10 +450,22 @@ export function AdminDashboard() {
                 </div>
             </div>
 
-            {editingProduct && (
+            {(editingProduct || isAddingProduct) && (
                 <EditProductModal
-                    product={editingProduct}
-                    onClose={() => setEditingProduct(null)}
+                    product={editingProduct || {
+                        id: '',
+                        name: '',
+                        description: '',
+                        price: 0,
+                        stock: 50,
+                        category: 'rod',
+                        image: '/images/rod.png',
+                        reviews: []
+                    }}
+                    onClose={() => {
+                        setEditingProduct(null);
+                        setIsAddingProduct(false);
+                    }}
                     onSave={handleSaveProduct}
                 />
             )}

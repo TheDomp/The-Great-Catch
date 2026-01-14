@@ -63,7 +63,7 @@ export function ProductPage() {
                             </div>
                         </div>
                         <h1 className="text-4xl font-bold text-white mb-2" data-testid="product-title">{product.name}</h1>
-                        <p className="text-3xl font-bold text-primary-foreground" data-testid="product-price">${product.price}</p>
+                        <p className="text-3xl font-bold text-primary-foreground" data-testid="product-price">€{product.price}</p>
                     </div>
 
                     <div className="p-4 bg-surface rounded-lg border border-white/5 flex items-center justify-between">
@@ -80,7 +80,7 @@ export function ProductPage() {
                             data-testid="add-to-cart-btn"
                         >
                             <ShoppingCart className="w-5 h-5" />
-                            Add to Cart
+                            Add to Vessel
                         </button>
                     </div>
 
