@@ -5,10 +5,12 @@ import * as path from 'path';
 const testProfile = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'test-profile.json'), 'utf-8'));
 
 test.describe('Checkout Flow', () => {
-    test('should complete a full purchase flow', async ({ page }) => {
-        // 1. Add item to cart
+    test('should complete a full purchase flow with Carbon-Elite Caster', async ({ page }) => {
+        // 1. Add 'Carbon-Elite Caster' to cart
         await page.goto('/');
-        await page.locator('[data-testid^="add-to-cart-"]').first().click();
+        const premiumRod = page.locator('[data-testid="product-card-rod-1"]');
+        await expect(premiumRod).toBeVisible();
+        await page.locator('[data-testid="add-to-cart-rod-1"]').click();
 
         // 2. Go to cart
         await page.locator('[data-testid="cart-btn"]').click();

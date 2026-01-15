@@ -5,24 +5,34 @@ test.describe('Shop Functionality', () => {
         await page.goto('/');
     });
 
-    test('should display products and filter by category', async ({ page }) => {
+    test('should display all v0.8.0 handcrafted products', async ({ page }) => {
         // Check if products are visible
         const productCards = page.locator('[data-testid^="product-card-"]');
         await expect(productCards.first()).toBeVisible();
 
-        // Get initial product count
-        const initialCount = await productCards.count();
-        expect(initialCount).toBeGreaterThan(0);
+        // Verify exact v0.8.0 product count
+        const productCount = await productCards.count();
+        expect(productCount).toBe(14);
 
+        // Verify premium handcrafted items are present
+        await expect(page.locator('text=Carbon-Elite Caster')).toBeVisible();
+        await expect(page.locator('text=Storm-Shield Chest Waders')).toBeVisible();
+        await expect(page.locator('text=Cyber-Byte Robotic Frog')).toBeVisible();
+    });
+
+    test('should filter by specific v0.8.0 categories', async ({ page }) => {
         // Filter by 'rod'
         const rodFilter = page.locator('[data-testid="filter-category-rod"]');
         await rodFilter.click();
 
-        // Verify filtered results
+        // Verify filtered results - expect 3 rods in v0.8.0
         const filteredCards = page.locator('[data-testid^="product-card-rod-"]');
-        await expect(filteredCards.first()).toBeVisible();
+        await expect(filteredCards).toHaveCount(3);
+        await expect(page.locator('text=Carbon-Elite Caster')).toBeVisible();
+        await expect(page.locator('text=Ocean-Blue Deep Sea')).toBeVisible();
+        await expect(page.locator('text=Trout-Whisperer Lite')).toBeVisible();
 
-        // Verify that other categories are NOT visible (or at least rods are prominent)
+        // Verify that other categories are NOT visible
         const reelCards = page.locator('[data-testid^="product-card-reel-"]');
         await expect(reelCards).toHaveCount(0);
     });

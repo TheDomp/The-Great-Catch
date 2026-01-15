@@ -1,19 +1,23 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Products API', () => {
-    test('should fetch all products', async ({ request }) => {
+    test('should fetch all v0.8.0 handcrafted products', async ({ request }) => {
         const response = await request.get('/api/products');
         expect(response.ok()).toBeTruthy();
 
         const products = await response.json();
         expect(Array.isArray(products)).toBeTruthy();
-        expect(products.length).toBeGreaterThan(0);
+        expect(products).toHaveLength(14);
 
-        // Check product structure
-        const product = products[0];
-        expect(product).toHaveProperty('id');
-        expect(product).toHaveProperty('name');
-        expect(product).toHaveProperty('price');
+        // Check for specific handcrafted products
+        const rod1 = products.find((p: any) => p.id === 'rod-1');
+        expect(rod1).toBeDefined();
+        expect(rod1.name).toBe('Carbon-Elite Caster');
+        expect(rod1.description).toContain('Ultra-high modulus carbon fiber');
+
+        const lure5 = products.find((p: any) => p.id === 'lure-5');
+        expect(lure5).toBeDefined();
+        expect(lure5.name).toBe('Cyber-Byte Robotic Frog');
     });
 
     test('should filter products by category', async ({ request }) => {

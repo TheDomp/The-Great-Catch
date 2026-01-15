@@ -1,230 +1,177 @@
 [
     {
         "id": "rod-1",
-        "name": "Pro Caster X",
+        "name": "Carbon-Elite Caster",
         "category": "rod",
-        "price": 199,
-        "image": "/images/rod.png",
-        "description": "The Pro Caster X delivers exceptional casting distance with its ultra-lightweight carbon fiber construction. Perfect for both freshwater and saltwater fishing.",
-        "stock": 2,
+        "price": 2499,
+        "image": "/images/rod_pro_caster.png",
+        "description": "Ultra-high modulus carbon fiber construction. Precision-balanced for long, accurate casts. The ultimate choice for tournament anglers.",
+        "stock": 12,
         "reviews": [
             {
-                "id": "r-rod-1-1",
-                "user": "FisherMan88",
+                "id": "r1",
+                "user": "FisherPro",
                 "rating": 5,
-                "text": "Best rod I ever bought! The casting distance is incredible."
-            },
-            {
-                "id": "r-rod-1-2",
-                "user": "AnglerPro",
-                "rating": 4,
-                "text": "Solid performance, very lightweight and responsive."
+                "text": "The weight-to-strength ratio is incredible."
             }
         ]
     },
     {
         "id": "rod-2",
-        "name": "Carbon Fiber Elite",
+        "name": "Ocean-Blue Deep Sea",
         "category": "rod",
-        "price": 349,
-        "image": "/images/rod.png",
-        "description": "Tournament-grade rod with advanced sensitivity technology. Feel every nibble and set the hook with precision timing.",
+        "price": 3899,
+        "image": "/images/rod_ocean_blue.png",
+        "description": "Built to withstand the toughest ocean conditions. Reinforced golden guides and a solid backbone for big game battles.",
         "stock": 5,
         "reviews": [
             {
-                "id": "r-rod-2-1",
-                "user": "TournamentKing",
+                "id": "r2",
+                "user": "SeaHunter",
                 "rating": 5,
-                "text": "Won my first competition with this beauty!"
+                "text": "Handled a 100lb tuna with ease."
             }
         ]
     },
     {
         "id": "rod-3",
-        "name": "Coastal Guardian",
+        "name": "Trout-Whisperer Lite",
         "category": "rod",
-        "price": 279,
-        "image": "/images/rod.png",
-        "description": "Built to withstand harsh saltwater conditions. Corrosion-resistant guides and reinforced reel seat for heavy-duty ocean fishing.",
+        "price": 1899,
+        "image": "/images/rod_trout_whisperer.png",
+        "description": "A delicate fly rod with a soft touch. Perfect for presentation in crystal clear mountain streams. Features a premium cork handle.",
         "stock": 8,
-        "reviews": [
-            {
-                "id": "r-rod-3-1",
-                "user": "SaltLife",
-                "rating": 5,
-                "text": "Handles big game fish with ease. Worth every penny."
-            }
-        ]
+        "reviews": []
     },
     {
         "id": "reel-1",
-        "name": "Spin Doctor 500",
+        "name": "Spin-Doctor Precision",
         "category": "reel",
-        "price": 299,
-        "image": "/images/reel.png",
-        "description": "Silky-smooth 10-bearing system with instant anti-reverse. Features precision machined brass gears for years of reliable performance.",
-        "stock": 2,
+        "price": 1599,
+        "image": "/images/reel_spin_doctor.png",
+        "description": "12+1 stainless steel ball bearings for butter-smooth rotation. Sealed drag system ensures performance in any environment.",
+        "stock": 15,
         "reviews": [
             {
-                "id": "r-reel-1-1",
-                "user": "FisherMan88",
-                "rating": 5,
-                "text": "The drag system is incredibly smooth!"
-            },
-            {
-                "id": "r-reel-1-2",
-                "user": "AnglerPro",
+                "id": "r3",
+                "user": "SmoothCast",
                 "rating": 4,
-                "text": "Great value for a high-quality spinning reel."
+                "text": "Very nice drag, but a bit heavy."
             }
         ]
     },
     {
         "id": "reel-2",
-        "name": "Baitcaster Pro 3000",
+        "name": "Bait-Runner Carbon GT",
         "category": "reel",
-        "price": 449,
-        "image": "/images/reel.png",
-        "description": "Professional baitcasting reel with magnetic brake system. Zero backlash technology makes it perfect for beginners and pros alike.",
-        "stock": 4,
-        "reviews": [
-            {
-                "id": "r-reel-2-1",
-                "user": "BassHunter",
-                "rating": 5,
-                "text": "Finally a baitcaster I can cast without bird nests!"
-            }
-        ]
+        "price": 2199,
+        "image": "/images/reel_bait_runner.png",
+        "description": "Stealthy matte black finish with carbon fiber handle. High-speed gear ratio for quick retrievals and aggressive hook sets.",
+        "stock": 10,
+        "reviews": []
     },
     {
         "id": "reel-3",
-        "name": "Ultralight Spinner",
+        "name": "Classic-Aura Fly Reel",
         "category": "reel",
-        "price": 179,
-        "image": "/images/reel.png",
-        "description": "Compact and featherweight design for finesse fishing. Perfect for trout, panfish, and light bass applications.",
-        "stock": 12,
-        "reviews": [
-            {
-                "id": "r-reel-3-1",
-                "user": "TroutWhisperer",
-                "rating": 5,
-                "text": "So light I forget it's even there. Amazing sensitivity."
-            }
-        ]
+        "price": 1299,
+        "image": "/images/reel_fly_classic.png",
+        "description": "Timeless design meeting modern engineering. Vintage aesthetic with a wide-arbor spool for reduced line memory.",
+        "stock": 20,
+        "reviews": []
     },
     {
         "id": "lure-1",
-        "name": "Neon Minnow",
+        "name": "Neon Ghost Minnow",
         "category": "lure",
-        "price": 19,
-        "image": "/images/lures.png",
-        "description": "UV-reactive finish that glows underwater. Irresistible swimming action triggers aggressive strikes from predatory fish.",
-        "stock": 25,
+        "price": 129,
+        "image": "/images/lure_neon_ghost.png",
+        "description": "Translucent ghost-body with internal neon neuro-light technology. Irresistible to predators in low-light conditions.",
+        "stock": 50,
         "reviews": [
             {
-                "id": "r-lure-1-1",
-                "user": "FisherMan88",
+                "id": "r4",
+                "user": "NightFish",
                 "rating": 5,
-                "text": "Fish can't resist this thing! Caught my PB bass with it."
-            },
-            {
-                "id": "r-lure-1-2",
-                "user": "AnglerPro",
-                "rating": 4,
-                "text": "Great action, durable paint job too."
+                "text": "They hit it like a truck at dusk!"
             }
         ]
     },
     {
         "id": "lure-2",
-        "name": "Deep Diver Crankbait",
+        "name": "Deep-Sea Kraken Jig",
         "category": "lure",
-        "price": 24,
-        "image": "/images/lures.png",
-        "description": "Reaches depths up to 20 feet with a tight wobble action. Internal rattles call fish in from long distances.",
-        "stock": 18,
-        "reviews": [
-            {
-                "id": "r-lure-2-1",
-                "user": "DeepSeeker",
-                "rating": 5,
-                "text": "Found the fish nobody else could reach!"
-            }
-        ]
+        "price": 189,
+        "image": "/images/lure_kraken_jig.png",
+        "description": "Hyper-realistic multi-tentacle action. Iridescent scales and emerald glowing eyes designed to mimic deep-sea cephalopods.",
+        "stock": 30,
+        "reviews": []
     },
     {
         "id": "lure-3",
-        "name": "Topwater Frog",
+        "name": "Voltage Electric Eel",
         "category": "lure",
-        "price": 16,
-        "image": "/images/lures.png",
-        "description": "Weedless design slides through thick vegetation. Explosive surface strikes guaranteed when bass are in the shallows.",
-        "stock": 30,
-        "reviews": [
-            {
-                "id": "r-lure-3-1",
-                "user": "FrogMan",
-                "rating": 5,
-                "text": "Heart-stopping blowups! This is why I fish."
-            }
-        ]
+        "price": 159,
+        "image": "/images/lure_electric_eel.png",
+        "description": "Sinuous swimming motion with blue lightning patterns. Creates micro-vibrations that trigger lateral line responses.",
+        "stock": 45,
+        "reviews": []
+    },
+    {
+        "id": "lure-4",
+        "name": "Molten Magma Crank",
+        "category": "lure",
+        "price": 149,
+        "image": "/images/lure_magma_crank.png",
+        "description": "Built for high-energy aggression. The cracked-lava finish creates unique light reflections in murky waters.",
+        "stock": 25,
+        "reviews": []
+    },
+    {
+        "id": "lure-5",
+        "name": "Cyber-Byte Robotic Frog",
+        "category": "lure",
+        "price": 199,
+        "image": "/images/lure_cyber_frog.png",
+        "description": "Steampunk-inspired surface popper. Brass gears and robotic movements create a erratic splashing profile.",
+        "stock": 15,
+        "reviews": []
     },
     {
         "id": "clothing-1",
-        "name": "Performance Vest",
+        "name": "Storm-Shield Chest Waders",
         "category": "clothing",
-        "price": 89,
-        "image": "/images/clothing.png",
-        "description": "Breathable mesh construction keeps you cool on hot days. 12 pockets for all your tackle, tools, and accessories.",
-        "stock": 7,
+        "price": 2999,
+        "image": "/images/clothing_storm_waders.png",
+        "description": "Professional grade camouflage waders. 5-layer breathable fabric with reinforced puncture-resistant knees.",
+        "stock": 10,
         "reviews": [
             {
-                "id": "r-clothing-1-1",
-                "user": "FisherMan88",
+                "id": "r5",
+                "user": "DryGuy",
                 "rating": 5,
-                "text": "So many pockets! Never running back to the tackle box."
-            },
-            {
-                "id": "r-clothing-1-2",
-                "user": "AnglerPro",
-                "rating": 4,
-                "text": "Comfortable fit, great for all-day wearing."
+                "text": "Best waders I have owned. No leaks after a season."
             }
         ]
     },
     {
         "id": "clothing-2",
-        "name": "Waders Pro Breathable",
+        "name": "Aqua-Shield UV Hoodie",
         "category": "clothing",
-        "price": 249,
-        "image": "/images/clothing.png",
-        "description": "4-layer breathable fabric keeps you dry from the inside out. Reinforced knees and neoprene booties for maximum durability.",
-        "stock": 4,
-        "reviews": [
-            {
-                "id": "r-clothing-2-1",
-                "user": "RiverRunner",
-                "rating": 5,
-                "text": "Finally waders that don't make me sweat! Game changer."
-            }
-        ]
+        "price": 699,
+        "image": "/images/clothing_uv_hoodie.png",
+        "description": "Lightweight, cooling fabric with SPF 50+ protection. Integrated neck gaiter for total sun coverage on the water.",
+        "stock": 25,
+        "reviews": []
     },
     {
         "id": "clothing-3",
-        "name": "Cargo Pants",
+        "name": "Offshore Heavy Jacket",
         "category": "clothing",
-        "price": 79,
-        "image": "/images/clothing.png",
-        "description": "Quick-dry fabric with UPF 50+ sun protection. Convertible zip-off legs transform into shorts when temperatures rise.",
+        "price": 1499,
+        "image": "/images/clothing_heavy_jacket.png",
+        "description": "Tested in the North Sea. Extreme wind and water protection with high-visibility reflective elements.",
         "stock": 15,
-        "reviews": [
-            {
-                "id": "r-clothing-3-1",
-                "user": "AllDayAngler",
-                "rating": 5,
-                "text": "Perfect for those days when weather keeps changing."
-            }
-        ]
+        "reviews": []
     }
 ]
