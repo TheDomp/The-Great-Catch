@@ -8,10 +8,7 @@ import {
     getDoc,
     doc,
     addDoc,
-    updateDoc,
-    query,
-    where,
-    orderBy as firestoreOrderBy
+    updateDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
