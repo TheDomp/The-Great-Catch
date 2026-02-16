@@ -1,3 +1,14 @@
+---
+title: The Great Catch
+emoji: 🎣
+colorFrom: blue
+colorTo: indigo
+sdk: static
+app_file: dist/index.html
+app_build_command: npm run build
+pinned: false
+---
+
 # The Great Catch
 
 A modern, test-optimized e-commerce SPA for sport fishing enthusiasts.
