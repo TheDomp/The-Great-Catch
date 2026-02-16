@@ -29,7 +29,24 @@ export default {
       },
       boxShadow: {
         'premium': '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
-        'cyan-glow': '0 0 20px rgba(0, 180, 216, 0.3)',
+        'cyan-glow': '0 0 20px rgba(0, 180, 216, 0.5)',
+        'neon-blue': '0 0 10px rgba(3, 105, 161, 0.6), 0 0 20px rgba(3, 105, 161, 0.4)',
+        'neon-accent': '0 0 10px rgba(255, 215, 0, 0.6), 0 0 20px rgba(255, 215, 0, 0.4)',
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        glow: {
+          'from': { boxShadow: '0 0 10px rgba(0, 180, 216, 0.2)' },
+          'to': { boxShadow: '0 0 20px rgba(0, 180, 216, 0.6), 0 0 10px rgba(0, 180, 216, 0.4)' },
+        }
       }
     },
   },

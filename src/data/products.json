@@ -173,5 +173,261 @@
         "description": "Tested in the North Sea. Extreme wind and water protection with high-visibility reflective elements.",
         "stock": 15,
         "reviews": []
+    },
+    {
+        "id": "rod-101",
+        "name": "Quantum X Carbon Rod 7ft",
+        "category": "rod",
+        "price": 320,
+        "image": "/images/quantum-x-rod.jpg",
+        "description": "High-modulus carbon fiber construction with a fast-action tip for superior sensitivity and hook-setting power.",
+        "stock": 15,
+        "reviews": [
+            {
+                "id": "r101",
+                "user": "BassMaster99",
+                "rating": 5,
+                "text": "Incredible sensitivity, felt every nibble."
+            }
+        ]
+    },
+    {
+        "id": "reel-102",
+        "name": "Stealth-Glide Spinning Reel",
+        "category": "reel",
+        "price": 245,
+        "image": "/images/stealth-glide-reel.jpg",
+        "description": "Featuring a magnesium body and ceramic ball bearings for a feather-light feel and silent, smooth retrieval.",
+        "stock": 8,
+        "reviews": [
+            {
+                "id": "r102",
+                "user": "LureLover",
+                "rating": 4,
+                "text": "Smooth as silk, but slightly pricey."
+            }
+        ]
+    },
+    {
+        "id": "lure-103",
+        "name": "Electro-Vibe Bass Popper",
+        "category": "lure",
+        "price": 24,
+        "image": "/images/electro-vibe-popper.jpg",
+        "description": "Water-activated LED technology mimics wounded baitfish distress signals, irresistible to aggressive bass.",
+        "stock": 45,
+        "reviews": []
+    },
+    {
+        "id": "clothing-104",
+        "name": "Hydro-Breaker Gore-Tex Jacket",
+        "category": "clothing",
+        "price": 450,
+        "image": "/images/hydrobreaker-jacket.jpg",
+        "description": "Elite-level waterproofing and breathability for extreme offshore conditions. Rated for 48 hours of heavy rain.",
+        "stock": 12,
+        "reviews": [
+            {
+                "id": "r104",
+                "user": "OffshoreSalty",
+                "rating": 5,
+                "text": "Stayed bone dry in a gale."
+            }
+        ]
+    },
+    {
+        "id": "reel-105",
+        "name": "Digital-Drag Baitcaster",
+        "category": "reel",
+        "price": 580,
+        "image": "/images/digital-drag-reel.jpg",
+        "description": "Microprocessor-controlled drag system eliminates backlashes and provides precision tension for every species.",
+        "stock": 6,
+        "reviews": []
+    },
+    {
+        "id": "rod-106",
+        "name": "Titanium Flex Surf Rod 14ft",
+        "category": "rod",
+        "price": 720,
+        "image": "/images/titanium-flex-surf.jpg",
+        "description": "Engineered for distance casting, this titanium-composite rod offers a parabolic bend that launches weights beyond the horizon.",
+        "stock": 5,
+        "reviews": [
+            {
+                "id": "r106",
+                "user": "BeachAngler",
+                "rating": 5,
+                "text": "Casting distance is insane."
+            }
+        ]
+    },
+    {
+        "id": "lure-107",
+        "name": "Bio-Scent Soft Craw",
+        "category": "lure",
+        "price": 118,
+        "image": "/images/bioscent-craw.jpg",
+        "description": "Biodegradable polymer injected with pheromone technology to trigger predatory instincts in bass and walleye.",
+        "stock": 100,
+        "reviews": [
+            {
+                "id": "r107",
+                "user": "EcoFriendly",
+                "rating": 5,
+                "text": "Finally, an eco-friendly soft bait that works."
+            }
+        ]
+    },
+    {
+        "id": "clothing-108",
+        "name": "Thermal-Regulated Wader System",
+        "category": "clothing",
+        "price": 6500,
+        "image": "/images/thermal-wader.jpg",
+        "description": "Breathable chest waders with active heating elements in the booties, controllable via smartphone app for all-day comfort.",
+        "stock": 10,
+        "reviews": [
+            {
+                "id": "r108",
+                "user": "IceFisher",
+                "rating": 5,
+                "text": "My feet stayed warm in 30 degree water."
+            }
+        ]
+    },
+    {
+        "id": "rod-109",
+        "name": "Apex Predator Trolling Rod",
+        "category": "rod",
+        "price": 8500,
+        "image": "/images/apex-trolling.jpg",
+        "description": "Heavy-action rod designed for big game fishing, featuring AFTCO rollers and a rigid composite blank for marlin and tuna.",
+        "stock": 7,
+        "reviews": [
+            {
+                "id": "r109",
+                "user": "BigGameHunter",
+                "rating": 5,
+                "text": "Battled a 500lb tuna with ease."
+            }
+        ]
+    },
+    {
+        "id": "reel-110",
+        "name": "Quantum Sync Electric Reel",
+        "category": "reel",
+        "price": 12000,
+        "image": "/images/quantum-sync.jpg",
+        "description": "Programmable electric assist reel with auto-stop depth memory and LCD line counter for precision deep dropping.",
+        "stock": 4,
+        "reviews": [
+            {
+                "id": "r110",
+                "user": "DeepDropPro",
+                "rating": 5,
+                "text": "Technology is mind-blowing."
+            }
+        ]
+    },
+    {
+        "id": "clothing-111",
+        "name": "UV-Shield Angling Hoodie",
+        "category": "clothing",
+        "price": 850,
+        "image": "/images/uv-hoodie.jpg",
+        "description": "Ultra-light fabric with UPF 50+ protection and cooling crystal fibers woven into the material for desert heat rejection.",
+        "stock": 40,
+        "reviews": []
+    },
+    {
+        "id": "lure-112",
+        "name": "Sonic-Vibe Blade Bait",
+        "category": "lure",
+        "price": 320,
+        "image": "/images/sonic-vibe.jpg",
+        "description": "Tungsten blade bait with tuned frequency chambers that emit low-frequency vibrations to attract fish in muddy water.",
+        "stock": 60,
+        "reviews": []
+    },
+    {
+        "id": "rod-113",
+        "name": "Micro-Finesse Fly Rod 3wt",
+        "category": "rod",
+        "price": 4800,
+        "image": "/images/micro-finesse-fly.jpg",
+        "description": "A masterpiece of engineering for fly fishing purists, offering delicate presentations with nano-silica resin technology.",
+        "stock": 12,
+        "reviews": []
+    },
+    {
+        "id": "reel-114",
+        "name": "Hydro-Touch Spinning Reel 2500",
+        "category": "reel",
+        "price": 2750,
+        "image": "/images/hydrotouch-2500.jpg",
+        "description": "Features a touch-sensitive graphite rotor system and 11+1 ball bearings for ultra-smooth freshwater performance.",
+        "stock": 25,
+        "reviews": []
+    },
+    {
+        "id": "clothing-115",
+        "name": "Stealth-Frame Polarized Glasses",
+        "category": "clothing",
+        "price": 2200,
+        "image": "/images/stealth-glasses.jpg",
+        "description": "Polycarbonate lenses with hydrophobic coating and titanium frames that float, ensuring you never lose your sight on the water.",
+        "stock": 30,
+        "reviews": []
+    },
+    {
+        "id": "lure-116",
+        "name": "Abyssal Jigging Metal Lure",
+        "category": "lure",
+        "price": 280,
+        "image": "/images/abyssal-jig.jpg",
+        "description": "Asymmetric metal jig designed for erratic falling action, finished with a multi-layered corrosion-resistant coating.",
+        "stock": 80,
+        "reviews": []
+    },
+    {
+        "id": "clothing-117",
+        "name": "Kevlar-Reinforced Landing Glove",
+        "category": "clothing",
+        "price": 650,
+        "image": "/images/kevlar-glove.jpg",
+        "description": "Cut-resistant protection for handling toothy species, featuring a textured grip and quick-dry synthetic leather.",
+        "stock": 55,
+        "reviews": []
+    },
+    {
+        "id": "lure-118",
+        "name": "Tournament Pro Cast Net",
+        "category": "lure",
+        "price": 1200,
+        "image": "/images/cast-net.jpg",
+        "description": "High-radius spread net with 1lb lead weights per foot for rapid sinking and minimal escape routes for live bait.",
+        "stock": 18,
+        "reviews": []
+    },
+    {
+        "id": "rod-119",
+        "name": "Compact Telescopic Travel Rod",
+        "category": "rod",
+        "price": 1800,
+        "image": "/images/telescopic-travel.jpg",
+        "description": "High-modulus carbon rod that collapses to 18 inches, perfect for the jet-setting angler who refuses to compromise on quality.",
+        "stock": 22,
+        "reviews": []
+    },
+    {
+        "id": "clothing-120",
+        "name": "All-Terrain Wading Boots",
+        "category": "clothing",
+        "price": 1950,
+        "image": "/images/allterrain-boots.jpg",
+        "description": "Featuring interchangeable stud systems and a Vibram sole for ultimate traction on slick rocks and muddy banks.",
+        "stock": 15,
+        "reviews": []
     }
 ]

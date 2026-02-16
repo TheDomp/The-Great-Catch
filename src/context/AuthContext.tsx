@@ -1,13 +1,21 @@
-import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
+import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    deleteUser,
+    type User as FirebaseUser
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
 type Role = 'USER' | 'ADMIN';
 
-interface User {
-    id: string;
-    email: string;
-    name: string;
-    role: Role;
+export interface User extends FirebaseUser {
+    role?: Role;
+    name?: string;
 }
 
 interface AuthContextType {
@@ -28,79 +36,81 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
-        if (storedUser && token) {
-            setUser(JSON.parse(storedUser));
-        }
-        setLoading(false);
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                // Fetch additional user data from Firestore
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        setUser({ ...firebaseUser, ...userData } as User);
+                    } else {
+                        setUser(firebaseUser as User);
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                    setUser(firebaseUser as User);
+                }
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
     }, []);
 
-    const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+    const login = async (email: string, password: string): Promise<boolean> => {
         try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-
-            if (!response.ok) return false;
-
-            const data = await response.json();
-            setUser(data.user);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            localStorage.setItem('token', data.token);
+            await signInWithEmailAndPassword(auth, email, password);
             return true;
         } catch (error) {
             console.error('Login error:', error);
             return false;
         }
-    }, []);
+    };
 
-    const register = useCallback(async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
+    const register = async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
         try {
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, name })
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const { user: newUser } = userCredential;
+
+            // Create user document in Firestore
+            await setDoc(doc(db, 'users', newUser.uid), {
+                email: newUser.email,
+                name: name,
+                role: 'USER',
+                createdAt: new Date().toISOString()
             });
 
-            const data = await response.json();
-            if (!response.ok) return { success: false, error: data.error };
-
-            setUser(data.user);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            localStorage.setItem('token', data.token);
             return { success: true };
         } catch (error: any) {
             console.error('Register error:', error);
-            return { success: false, error: 'The sea is too rough. Try again later.' };
+            return { success: false, error: error.message || 'Registration failed' };
         }
-    }, []);
+    };
 
-    const logout = useCallback(async () => {
-        setUser(null);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-    }, []);
-
-    const deleteAccount = useCallback(async (): Promise<boolean> => {
-        if (!user) return false;
+    const logout = async () => {
         try {
-            const response = await fetch(`/api/users/${user.id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            });
-            if (response.ok) {
-                await logout();
-                return true;
-            }
-            return false;
+            await signOut(auth);
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
+
+    const deleteAccount = async (): Promise<boolean> => {
+        if (!auth.currentUser) return false;
+        try {
+            // Delete user document from Firestore
+            await deleteDoc(doc(db, 'users', auth.currentUser.uid));
+            // Delete user from Auth
+            await deleteUser(auth.currentUser);
+            return true;
         } catch (error) {
             console.error('Delete account error:', error);
             return false;
         }
-    }, [user, logout]);
+    };
 
     const value = useMemo(() => ({
         user,
@@ -111,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isAdmin: user?.role === 'ADMIN',
         loading
-    }), [user, loading, login, register, deleteAccount, logout]);
+    }), [user, loading]);
 
     return (
         <AuthContext.Provider value={value}>
