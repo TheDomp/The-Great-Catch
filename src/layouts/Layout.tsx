@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
+import { EnvSwitcher } from '../components/EnvSwitcher';
 
 export function Layout() {
     const { loading } = useAuth();
@@ -28,6 +29,7 @@ export function Layout() {
                 <Outlet />
             </main>
             <Footer />
+            <EnvSwitcher />
         </div>
     );
 }

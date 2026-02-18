@@ -137,14 +137,17 @@ export function LoginPage() {
                             <p className="text-[10px] text-slate-500 font-bold uppercase">Admin</p>
                             <p className="text-xs text-primary font-mono truncate">admin_fix_…@test.se</p>
                         </button>
-                        <button
-                            className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left"
-                            onClick={() => { setEmail('customer_fix_1771244419421@test.se'); setPassword('Password123!'); }}
-                            aria-label="Login as Test User"
-                        >
-                            <p className="text-[10px] text-slate-500 font-bold uppercase">Test User</p>
-                            <p className="text-xs text-primary font-mono truncate">customer_fix_…@test.se</p>
-                        </button>
+                        {[401, 402, 403].map(i => (
+                            <button
+                                key={i}
+                                className="bg-white/5 p-3 rounded-xl border border-white/5 hover:border-primary/30 transition-all text-left"
+                                onClick={() => { setEmail(`fishing.enthusiast.${i}@thegreatcatch.test`); setPassword('Password123!'); }}
+                                aria-label={`Login as Synthetic User ${i}`}
+                            >
+                                <p className="text-[10px] text-slate-500 font-bold uppercase">Expert {i}</p>
+                                <p className="text-xs text-sky-400 font-mono truncate">enthusiast.{i}…</p>
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>

@@ -11,7 +11,7 @@ type Step = 'address' | 'payment' | 'confirmation';
 export function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart();
     const { checkout } = useApi();
-    const { isAuthenticated, loading: authLoading } = useAuth();
+    const { user, isAuthenticated, loading: authLoading } = useAuth();
     const navigate = useNavigate();
 
     const [step, setStep] = useState<Step>('address');
@@ -26,10 +26,54 @@ export function CheckoutPage() {
     const [orderDetails, setOrderDetails] = useState<{ id: string; total: number } | null>(null);
 
     useEffect(() => {
+        // Load persisted data from session storage
+        const savedData = sessionStorage.getItem('checkout_backup');
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                setFormData(prev => ({ ...prev, ...parsed }));
+            } catch (e) {
+                console.error("Failed to restore checkout data");
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        // Save current progress to session (excluding sensitive items list which is in CartContext)
+        const persistenceData = {
+            address: formData.address,
+            payment: formData.payment,
+            discountCode: formData.discountCode
+        };
+        sessionStorage.setItem('checkout_backup', JSON.stringify(persistenceData));
+    }, [formData.address, formData.payment, formData.discountCode]);
+
+    useEffect(() => {
         if (!authLoading && !isAuthenticated) {
             navigate('/login?redirectTo=/checkout');
+        } else if (isAuthenticated && user) {
+            // Autofill from user profile ONLY if session storage is empty (first time)
+            const hasBackup = !!sessionStorage.getItem('checkout_backup');
+            if (hasBackup) return;
+
+            const profile = user as any;
+            if (profile.address || profile.payment) {
+                setFormData(prev => ({
+                    ...prev,
+                    address: {
+                        street: profile.address?.street || prev.address.street,
+                        city: profile.address?.city || prev.address.city,
+                        zip: profile.address?.zip || prev.address.zip,
+                    },
+                    payment: {
+                        cardNumber: profile.payment?.cardNumber || prev.payment.cardNumber,
+                        expiry: profile.payment?.expiry || prev.payment.expiry,
+                        cvc: profile.payment?.cvc || prev.payment.cvc,
+                    }
+                }));
+            }
         }
-    }, [isAuthenticated, authLoading, navigate]);
+    }, [isAuthenticated, authLoading, navigate, user]);
 
     if (authLoading) {
         return (
@@ -69,10 +113,45 @@ export function CheckoutPage() {
     };
 
     const validatePayment = () => {
+        const p = formData.payment;
+        const cleanCard = p.cardNumber.replace(/\s/g, '');
         const cardRegex = /^\d{16}$/;
-        return cardRegex.test(formData.payment.cardNumber.replace(/\s/g, '')) &&
-            formData.payment.expiry &&
-            formData.payment.cvc;
+        const expiryRegex = /^(0[1-9]|1[0-2])\s?\/\s?\d{2}$/;
+        const cvcRegex = /^\d{3}$/;
+
+        if (!cardRegex.test(cleanCard)) return false;
+        if (!expiryRegex.test(p.expiry)) return false;
+        if (!cvcRegex.test(p.cvc)) return false;
+
+        // Past date check
+        const [m, y] = p.expiry.split('/').map(s => parseInt(s.trim()));
+        const now = new Date();
+        const curY = now.getFullYear() % 100;
+        const curM = now.getMonth() + 1;
+
+        if (y < curY) return false;
+        if (y === curY && m < curM) return false;
+
+        return true;
+    };
+
+    const getPaymentError = () => {
+        const p = formData.payment;
+        if (!p.cardNumber) return null;
+        const cleanCard = p.cardNumber.replace(/\s/g, '');
+        if (cleanCard && !/^\d{16}$/.test(cleanCard)) return "Invalid card sequence.";
+
+        if (p.expiry) {
+            if (!/^(0[1-9]|1[0-2])\s?\/\s?\d{2}$/.test(p.expiry)) return "Date format error (MM/YY).";
+            const [m, y] = p.expiry.split('/').map(s => parseInt(s.trim()));
+            const now = new Date();
+            const curY = now.getFullYear() % 100;
+            const curM = now.getMonth() + 1;
+            if (y < curY || (y === curY && m < curM)) return "Credentials have expired.";
+        }
+
+        if (p.cvc && !/^\d{3}$/.test(p.cvc)) return "Auth code must be 3 digits.";
+        return null;
     };
 
     const handleSubmit = async () => {
@@ -85,6 +164,7 @@ export function CheckoutPage() {
             });
 
             setOrderDetails({ id: result.orderId, total: result.total });
+            sessionStorage.removeItem('checkout_backup');
             clearCart();
             setStep('confirmation');
         } catch (err) {
@@ -275,23 +355,32 @@ export function CheckoutPage() {
                                     </div>
                                 </div>
 
-                                <div className="pt-10 flex items-center justify-between">
-                                    <button
-                                        onClick={() => setStep('address')}
-                                        className="text-slate-500 hover:text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-colors px-4 py-2"
-                                    >
-                                        <ChevronLeft className="w-4 h-4" /> Re-route Logistics
-                                    </button>
-                                    <button
-                                        onClick={handleSubmit}
-                                        disabled={!validatePayment() || loading}
-                                        className="bg-primary hover:bg-primary-dark disabled:opacity-20 disabled:cursor-not-allowed text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-primary/30 flex items-center gap-4"
-                                        data-testid="submit-order-btn"
-                                    >
-                                        {loading ? 'Processing...' : (
-                                            <>Authorize Transfer — €{formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}</>
-                                        )}
-                                    </button>
+                                <div className="pt-10">
+                                    {getPaymentError() && (
+                                        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl animate-fade-in">
+                                            <p className="text-[10px] text-red-500 font-black uppercase tracking-widest text-center">
+                                                ⚠ Security Alert: {getPaymentError()}
+                                            </p>
+                                        </div>
+                                    )}
+                                    <div className="flex items-center justify-between">
+                                        <button
+                                            onClick={() => setStep('address')}
+                                            className="text-slate-500 hover:text-white font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-colors px-4 py-2"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" /> Re-route Logistics
+                                        </button>
+                                        <button
+                                            onClick={handleSubmit}
+                                            disabled={!validatePayment() || loading}
+                                            className="bg-primary hover:bg-primary-dark disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-primary/30 flex items-center gap-4"
+                                            data-testid="submit-order-btn"
+                                        >
+                                            {loading ? 'Processing...' : (
+                                                <>Authorize Transfer — €{formData.discountCode === 'FISKE20' ? Math.round(cartTotal * 0.8) : cartTotal}</>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}

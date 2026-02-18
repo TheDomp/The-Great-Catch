@@ -4,8 +4,7 @@ emoji: 🎣
 colorFrom: blue
 colorTo: indigo
 sdk: static
-app_file: dist/index.html
-app_build_command: npm run build
+app_file: index.html
 pinned: false
 ---
 
@@ -20,6 +19,15 @@ A modern, test-optimized e-commerce SPA for sport fishing enthusiasts.
 - **Cart & Checkout**: Full checkout flow with simulated payment and validation.
 - **Admin Dashboard**: Protected area for inventory management.
 - **Chaos Engine**: Built-in tools to simulate latency, errors, and edge cases for robust testing.
+
+## Database Access (Firebase)
+
+The project uses two separate environments. You can track data (products, users, orders) in the Firebase Console:
+
+- **PROD (Produktion)**: [console.firebase.google.com/project/the-great-catch/firestore/data](https://console.firebase.google.com/project/the-great-catch/firestore/data)
+- **TEST (Testmiljö)**: [console.firebase.google.com/project/the-great-catch-test/firestore/data](https://console.firebase.google.com/project/the-great-catch-test/firestore/data)
+
+> **Note**: If you see a "Create a database" screen, just follow the 3 steps to enable the UI. Choose **Standard**, pick a location in **Europe**, and select **Start in Test Mode**. Your data is already there!
 
 ## Tech Stack
 

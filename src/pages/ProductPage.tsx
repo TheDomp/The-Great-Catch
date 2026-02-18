@@ -5,6 +5,7 @@ import type { Product } from '../data/mockData';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, Star, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { ProductCardSkeleton } from '../components/ProductCardSkeleton';
+import { CatchWhisperer } from '../components/CatchWhisperer';
 
 export function ProductPage() {
     const { id } = useParams<{ id: string }>();
@@ -83,6 +84,8 @@ export function ProductPage() {
                             Add to Vessel
                         </button>
                     </div>
+
+                    <CatchWhisperer product={product} />
 
                     <div className="mt-8">
                         <div className="flex border-b border-white/10">
